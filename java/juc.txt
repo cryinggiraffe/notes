@@ -1,0 +1,99 @@
+一、volatile 关键字：
+   当多个线程进行操作共享数据时，可以保证内存中的数据可见。
+   相较于 synchronized 是一种较为轻量级的同步策略。
+   注意：
+   1. volatile 不具备“互斥性”(相当于所有的操作都在主存内)
+   2. volatile 不能保证变量的“原子性”
+
+二、i++ 的原子性问题：
+   i++ 的操作实际上分为三个步骤“读-改-写”
+   int i = 10;i = i++; //10
+ 
+   int temp = i;
+   i = i + 1;
+   i = temp;
+  
+三、原子变量：在 java.util.concurrent.atomic 包下提供了一些原子变量。
+   1. volatile 保证内存可见性
+   2. CAS（Compare-And-Swap） 算法保证数据变量的原子性
+      CAS 算法是硬件对于并发操作的支持
+      CAS 包含了三个操作数：
+   	  ①内存值  V
+  	  ②预估值  A
+  	  ③更新值  B
+ 	  当且仅当 V == A 时， V = B; 否则，不会执行任何操作。
+      CAS算法：每次仅有一个线程对共享数据操作成功，没有所有的线程不会放弃CPU的执行权，不会发生阻塞
+
+四、concurentHashMap
+   1、CopyOnWriteArrayList/CopyOnWriteArraySet : “写入并复制”
+      注意：添加操作多时，效率低，因为每次添加时都会进行复制，开销非常的大。并发迭代操作多时可以选择。
+
+五、闭锁：CountDownLatch
+   1、在完成某些运算是，只有其他所有线程的运算全部完成，当前运算才继续执行
+   2、final CountDownLatch latch = new CountDownLatch(50);—>当前有多少个线程
+      LatchDemo ld = new LatchDemo(latch);
+   3、finally {
+			latch.countDown();
+	      }
+      无论线程执行成功与否，减1，countDown();
+
+六、创建执行线程的方式三：实现 Callable 接口。 
+   1、相较于实现 Runnable 接口的方式，方法可以有返回值，并且可以抛出异常。
+         ThreadDemo implements Callable<Integer>{
+
+	 @Override
+	 public Integer call() throws Exception{
+		return ; 
+      }
+   
+   2、执行 Callable 方式，需要 FutureTask 实现类的支持，用于接收运算结果。  
+   
+   3、FutureTask 是  Future 接口的实现类
+        
+      ThreadDemo td = new ThreadDemo();
+		
+      //1.执行 Callable 方式，需要 FutureTask 实现类的支持，用于接收运算结果。
+      FutureTask<Integer> result = new FutureTask<>(td);
+      new Thread(result).start();
+      //2.接收线程运算后的结果
+      Integer sum = result.get();  //FutureTask 可用于闭锁
+
+七、同步锁 Lock
+   1、是一个显示锁，需要通过 lock() 方法上锁，必须通过 unlock() 方法进行释放锁
+   2、synchronized:隐式锁
+      同步代码块
+      同步方法
+   3、finally{
+	   lock.unlock(); //释放锁
+	} 
+
+八、生产者与消费者
+   1、仅声明synchronized void get() 和 synchronized void sale()，不会产生等待唤醒机制，一个线程结束后才会执行另一个，会造成数据丢失
+   2、使用if(){wait()}else{notifAll};在何处wait，唤醒时，就从何处继续执行，else里的代码有可能不会执行。若一个线程先执行完，另一个线程满足if 条件，wait后，则没有线程将其唤醒，程序不会结束。
+   3、没有else时，两个线程可以正常执行，多个线程时，出现虚假唤醒。如两个消费者抢到资源后，wait后，生产者执行一次，唤醒了两个消费者，从wait处执行，执行两次-—product，所以会出现负数。
+   4、防止虚假唤醒，使用while
+
+九、用Lock实现
+   Condition condition = lock.newCondition();
+   condition.await();
+   condition.signalAll();
+
+十、练习：交替打印，ABCABCABC
+   AlternateDemo：
+   loopA：轮到，则打印A，唤醒B，否则await
+   loopB：轮到，则打印B，唤醒C，否则await
+   loopC：轮到，则打印C，唤醒A，否则await
+   创建三个线程：分别使用其中方法
+   for(int i = 1; i <= 20; i++){
+		ad.loopA(i);
+   }
+   打印20轮
+
+十一、读写锁
+   
+
+十二、线程八锁
+
+
+十三、线程池
+

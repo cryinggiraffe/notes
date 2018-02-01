@@ -1,0 +1,72 @@
+一、基本概念
+    1、fork:复制别人的仓库
+	2、pull request:发起请求，让别人合并自己的代码
+	3、watch:关注
+	4、issue:对没有成型的代码，需要讨论时用
+	5、借助github托管代码
+
+二、github的基本操作
+    1、创建文件
+	2、修改文件
+	3、删除文件
+	4、在commits中查看
+	5、上传文件
+    2、基本信息设置
+        1、设置用户名：git config —-global user.name ‘…’
+	2、设置邮箱：git config —-global user.email ‘…@qq.com’
+	3、查看设置：git config —list
+
+三、开源项目
+    1、新建issue
+	2、pull request
+	   1)fork项目
+	   2)修改自己仓库的项目代码
+	   3)发起pull request
+
+四、git操作
+    1、向仓库中添加文件：
+	   (1)工作区
+	   (2)暂存区
+	   (3)git仓库
+    2、git status:查看当前状态
+       git add xx.java (工作区->暂存区)
+       git commit -m "描述"
+	
+    3、流程：
+       (1)git init
+       (2)touch a1.php:添加文件
+       (3)git status
+       (4)git add a1.php (工作区->暂存区)
+       (5)git commit -m "add a1.php”:提交到仓库
+       
+       (6)修改：
+          1)vi 文件名
+          2)添加到暂存区
+          3)提交到仓库
+
+       (7)删除：
+          1)删除文件：rm ..
+          2)从git中删除文件：git rm ..
+	  3)提交操作：git commit -m ‘描述’
+
+       (8)提交到远程github：
+          1)git clone https://github.com/cryinggiraffe/test.git(仓库，第一次)
+          2）git add a1.php (工作区->暂存区)
+          3)git commit -m "add a1.php”:提交到仓库
+ 	  4)git push 
+https://github.com/cryinggiraffe/test.git
+五、常见问题：
+    1、没有权限：
+       (1)remote=“origin” url = https://用户名：密码@github.com/用户名／仓库名.git
+
+六、搭建个人网站：https://cryinggiraffe.github.io
+    1、创建:用户名.github.io的仓库
+    2、创建index.html文件
+       1)GitHub page仅支持静态页面，仓库里只能是.html文件
+
+    3、项目站点：
+       1)https://cryinggiraffe.github.io/仓库名
+       2)搭建过程：
+
+
+

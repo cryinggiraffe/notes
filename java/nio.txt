@@ -1,0 +1,53 @@
+一、简介
+   
+   1、与IO区别
+     (1)面向缓冲区
+     (2)非阻塞
+     (3)选择器
+   
+   2、通道和缓冲区
+     (1)通道表示打开到IO设备(例如:文件、套接字)的连接。
+     (2)若需要使用NIO系统，需要获取用于连接IO设备的通道以及用于容纳数据的缓冲区。操作缓冲区对数据进行处理。
+     (3)Channel 负责传输， Buffer 负责存储
+
+二、缓冲区
+   1、一个用于特定基本数据类型的容器，Buffer主要用于与NIO通道进行交互，数据是从通道读入缓冲区，从缓冲区写入通道
+   
+   2、Buffer就像一个数组，可以保存多个相同类型的数据
+      ByteBuffer
+      CharBuffer
+      ShortBuffer
+      IntBuffer
+      LongBuffer
+      FloatBuffer
+      DoubleBuffer
+      缓冲区的管理方式几乎一致，通过allocate()获取缓冲区   
+   
+   3、缓冲区存取数据的两个核心方法：
+      put() : 存入数据到缓冲区中
+       	put(byte b):将给定单个字节写入缓冲区的当前位置	put(byte[] src):将 src 中的字节写入缓冲区的当前位置	put(int index, byte b):将指定字节写入缓冲区的索引位置(不会移动 position)
+      
+      get() : 获取缓冲区中的数据
+        get() :读取单个字节	get(byte[] dst):批量读取多个字节到 dst 中	get(int index):读取指定索引位置的字节(不会移动 position)
+   
+   4、缓冲区中的四个核心属性：
+      capacity : 容量，表示缓冲区中最大存储数据的容量。一旦声明不能改变。
+      limit : 界限，表示缓冲区中可以操作数据的大小。（limit 后数据不能进行读写）
+      position : 位置，表示缓冲区中正在操作数据的位置。
+  
+      mark : 标记，表示记录当前 position 的位置。可以通过 reset() 恢复到 mark 的位置
+      
+      0 <= mark <= position <= limit <= capacity
+   
+   5、常用方法：
+      Buffer clear()：清空缓冲区并返回对缓冲区的引用      Buffer flip()：将缓冲区的界限设置为当前位置，并将当前位置充值为0
+      
+      初次分配空间，limit = capacity，写入n个数据后， position=n
+      通过 flip() 切换到读取模式：position = 0，limit = n;
+
+   6、直接缓冲区与非直接缓冲区：
+      非直接缓冲区：通过 allocate() 方法分配缓冲区，将缓冲区建立在 JVM 的内存中
+      直接缓冲区：通过 allocateDirect() 方法分配直接缓冲区，将缓冲区建立在物理内存中。可以提高效率
+      
+三、通道
+   
