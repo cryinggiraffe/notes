@@ -121,7 +121,7 @@ ctx.getBean(Hello.class); 不需强转，要求只有一个该类型的bean
 		 <bean id = "person6" class = "spring.beans.collections.Person" p:name="dcc" 
 	      p:age="10" p:cars-ref="cars" ></bean>
 
-	     <!-- 自动装配: 只声明 bean, 而把 bean 之间的关系交给 IOC 容器来完成 -->  
+	    自动装配: 只声明 bean, 而把 bean 之间的关系交给 IOC 容器来完成
 			byType: 根据类型进行自动装配. 但要求 IOC 容器中只有一个类型对应的 bean, 若有多个则无法完成自动装配.
 			byName: 若属性名和某一个 bean 的 id 名一致, 即可完成自动装配. 若没有 id 一致的, 则无法完成自动装配
 		<!-- 在使用 XML 配置时, 自动转配用的不多. 但在基于 注解 的配置时, 自动装配使用的较多.  -->
@@ -190,6 +190,42 @@ ctx.getBean(Hello.class); 不需强转，要求只有一个该类型的bean
 		IOC容器中Bean的生命周期
 			调用Bean的初始化方法 -> Bean可以使用
 			当容器关闭时 -> 调用Bean的销毁方法
+		Bean中的init-method destory-method
 
+		Bean的后置处理器：允许在调用初始化方法前后对Bean进行额外处理，对IOC容器中所有的Bean实例逐一处理
+		典型应用：检查Bean属性的正确性，或根据特定标准修改属性
+ 
+		配置 bean 后置处理器: 不需要配置 id 属性, IOC 容器会识别到他是一个 bean 后置处理器, 并调用其方法
+		<bean class="com.atguigu.spring.ref.MyBeanPostProcessor"></bean>
+
+		一个后置处理器可以处理所有的bean
 
 3、工厂方法注入
+	通过静态工厂方法: 一个类中有一个静态方法, 可以返回一个类的实例(了解) 
+	在 class 中指定静态工厂方法的全类名, 在 factory-method 中指定静态工厂方法的方法名
+	<bean id = "car1" class="sping.beans.factory.StacticCarFactory" factory-method="getCar">
+		<!-- 可以通过 constructor-arg 子节点为静态工厂方法指定参数 -->
+		<constructor-arg value="BMW"></constructor-arg>
+	</bean>
+
+	
+	实例工厂方法: 先需要创建工厂对象, 再调用工厂的非静态方法返回实例(了解) 
+	①. 创建工厂对应的 bean
+	<bean id = "carFactory" class="sping.beans.factory.InstanceCarFactory"></bean>
+	
+	②. 有实例工厂方法来创建 bean 实例
+	factory-bean 指向工厂 bean, factory-method 指定工厂方法(了解) 
+	<bean id = "car2" factory-bean="carFactory" factory-method="getCar">
+
+	<!-- 通过 constructor-arg 执行调用工厂方法需要传入的参数 -->
+		<constructor-arg value="BMW"></constructor-arg>
+	</bean>
+
+
+	配置通过 FactroyBean 的方式来创建 bean 的实例(了解)
+	class：FactroyBean 的全类名
+	property：配置 FactroyBean 的属性
+	但实际返回的实例是 FactroyBean 的 getObject() 返回的实例
+	<bean id = "car" class = "spring.beans.factorybean.CarFactoryBean"></bean>
+
+
