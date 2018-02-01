@@ -1,0 +1,69 @@
+Maven
+1、开发过程中，所有的路径或配置文件配置的类路径都是以编译结果的目录结构为标准的。
+2、Maven配置环境变量：
+   1)M2_HOME:文件夹目录
+   2)path:bin
+
+3、默认路径
+   系统当前用户的家目录\.m2\repository
+   C:\Users\[系统当前用户]\.m2\repository
+
+4、修改默认路径
+   Maven安装目录\conf\settings.xml
+   <localRepository>D:\RepMaven</localRepository>
+
+5、常用命令
+   mvn  clean：清理
+   mvn compile：编译主程序
+   mvn test-compile：编译并测试
+   mvn package：打包，只打包主程序不会打包测试，会执行测试
+
+6、坐标
+   groupid:公司或组织域名倒序+项目名
+   artifactid:模块名
+   version:版本
+
+   Maven工程与仓库中路径关系（根据坐标找到仓库中的jar包）
+   <groupid>org.springframework</groupid>
+   <artifactid>spring-core</artifactid>
+   <version>4.0.0RELRASE</version>
+对应:org/springframework/spring-core/4.0.0RELRASE/spring-core-4.0.0RELRASE.jar
+
+7、仓库
+   本地仓库
+   远程仓库：
+      私服
+      中央仓库
+      中央仓库镜像
+
+   仓库中保存的内容：Maven工程
+      自身所用的插件
+      第三方框架和jar包
+      自己开发的Maven工程
+
+8、依赖
+   compile:
+      对主程序是否有效：有效
+      对测试程序是否有效：有效
+      是否参与打包：参与
+      是否参与部署：参与
+      典型例子：sping-core
+
+   test:
+      对主程序是否有效：无效
+      对测试程序是否有效：有效
+      是否参与打包：不参与
+      是否参与部署：不参与
+      典型例子：junit
+
+   provided:
+      对主程序是否有效：有效
+      对测试程序是否有效：有效
+      是否参与打包：不参与
+      是否参与部署：不参与
+      典型例子：servlet-api.jar
+
+
+
+
+

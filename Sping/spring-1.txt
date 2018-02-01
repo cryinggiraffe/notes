@@ -1,0 +1,195 @@
+一、spring 中的Bean 配置
+<bean id="helloWorld" class="spring.beans.HelloWorld">
+		<property name="name" value="Spring"></property>
+</bean>
+class:bean的全类名，使用反射创建Bean，要求Bean中有无参构造器
+id:标识容器中的bean，id唯一。根据id引用bean
+
+//创建IOC容器
+ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+HelloWorld helloworld = (HelloWorld) ctx.getBean("helloWorld"); ->根据id获取bean
+
+二、创建IOC容器
+BeanFactory: IOC 容器的基本实现.
+ApplicationContext: 提供了更多的高级特性. 是 BeanFactory 的子接口.
+
+ApplicationContext 的主要实现类：
+ClassPathXmlApplicationContext：从 类路径下加载配置文件
+FileSystemXmlApplicationContext: 从文件系统中加载配置文件
+
+ConfigurableApplicationContext 扩展于 ApplicationContext，新增加两个主要方法：refresh() 和 close()， 让 ApplicationContext 具有启动、刷新和关闭上下文的能力
+ApplicationContext 在初始化上下文时就实例化所有单例的 Bean。
+
+三、获取bean
+ctx.getBean("helloWorld"); 强转，通过id定位到bean
+ctx.getBean(Hello.class); 不需强转，要求只有一个该类型的bean
+
+四、依赖注入
+1、属性注入
+   属性注入即通过 setter 方法注入Bean 的属性值或依赖的对象
+   属性注入使用 <property> 元素, 使用 name 属性指定 Bean 的属性名称，value 属性或 <value> 子节点指定属性值 
+   <property name="name" value="Spring"></property>
+
+2、构造器注入
+    可以根据 index 和 value 进行更加精确的定位. 
+	<bean id="car" class="spring.beans.Car">
+		<constructor-arg value="KUGA" index="1"></constructor-arg>
+		<constructor-arg value="ChangAnFord" index="0"></constructor-arg>
+		<constructor-arg value="250000" type="float"></constructor-arg>
+	</bean>
+
+	包裹value
+	特殊字符用<![CDATA[]]>包裹
+	<bean id = "car2" class = "spring.beans.Car">
+		<constructor-arg value="BWM" type="java.lang.String"></constructor-arg>
+		
+		<constructor-arg type="java.lang.String">
+			<value>
+				<![CDATA[<Shanghao^>]]>
+			</value>
+		</constructor-arg>
+		<constructor-arg type="int">
+			<value>210</value>
+		</constructor-arg>
+	</bean>
+
+	引用类型
+		<property name="car" ref="car2"></property>
+	或
+		<property name="car">
+			<ref bean = "car" />
+		</property>
+
+	内部bean,不能被外部引用
+		<property name="car">
+			<bean class = "spring.beans.Car">
+				<constructor-arg value="KUGA" index="1"></constructor-arg>
+				<constructor-arg value="ChangAnFord" index="0"></constructor-arg>
+				<constructor-arg value="250000" type="float"></constructor-arg>
+			</bean>
+		</property>
+
+	null专有标记:<null/>
+		<property name="dataSource"><null/></property>
+
+	设置级联属性
+		<constructor-arg ref="car"></constructor-arg>
+		<property name="car.maxSpeed" value="200"></property>
+
+	在xml文件中引用的bean和java文件中使用的类要一样。
+
+	集合属性：
+		<property name="cars">
+			<!-- 使用 list 元素来装配集合属性 -->
+			<list>
+				<ref bean="car"/>
+				<ref bean="car2"/>
+				<bean class = "sping.beans.Car">
+					<constructor-arg value="KUGA" ></constructor-arg>
+					<constructor-arg value="KUGA" ></constructor-arg>
+					<constructor-arg value="10" ></constructor-arg>
+				</bean>
+			</list>
+		</property>
+
+		Map
+		<property name="cars">
+		 	<map>
+		 		<entry key="A" value-ref="car2"></entry>
+		 		<entry key="B" value-ref="car2"></entry>
+		 	</map>
+		 </property>
+
+		 配置文件
+		 <property name="properties">
+	 		<props>
+	 			<prop key="user">root</prop>
+	 			<prop key="password">root</prop>
+	 			<prop key="jdbcUrl">jdbc:mysql:///test</prop>
+	 			<prop key="driverClass">com.mysql.jdbc.Driver</prop>
+	 		</props>
+	 	</property>
+
+	 	<!-- 声明集合类型的 bean -->
+		<util:list id="cars">
+			<ref bean="car"/>
+			<ref bean="car2"/>
+		</util:list>
+
+		p:
+		 <bean id = "person6" class = "spring.beans.collections.Person" p:name="dcc" 
+	      p:age="10" p:cars-ref="cars" ></bean>
+
+	     <!-- 自动装配: 只声明 bean, 而把 bean 之间的关系交给 IOC 容器来完成 -->  
+			byType: 根据类型进行自动装配. 但要求 IOC 容器中只有一个类型对应的 bean, 若有多个则无法完成自动装配.
+			byName: 若属性名和某一个 bean 的 id 名一致, 即可完成自动装配. 若没有 id 一致的, 则无法完成自动装配
+		<!-- 在使用 XML 配置时, 自动转配用的不多. 但在基于 注解 的配置时, 自动装配使用的较多.  -->
+		<bean id = "person" class = "spring.beans.autowire.Person"
+		p:name="tom" p:address-ref="address" p:car-ref="car"></bean>
+	
+		<bean id = "person2" class = "spring.beans.autowire.Person"
+		p:name="dcc" autowire="byName"></bean>
+	
+		<bean id = "person3" class = "spring.beans.autowire.Person"
+		p:name="tbw" autowire="byType"></bean>
+		
+		bean 的配置使用 parent 来完成继承：	
+		<bean id = "address1" class = "spring.beans.autowire.Address" 
+		p:city="Nanjing^_^" p:street="HanKou">
+		</bean>
+		<bean id = "address2"  p:street="Guangzhou" parent="address1">
+		</bean>
+
+		抽象bean，abstract="true"，不能被IOC实例化。若某一个bean属性缺失，则bean必须为抽象的
+
+
+		bean之间的依赖： depends-on
+		<bean id = "car" class = "spring.beans.autowire.Car"
+		p:brand="BMW" p:price="3000000"></bean>
+		<bean id = "person2" class = "spring.beans.autowire.Person"
+		p:name="tbw" p:address-ref="address3" depends-on="car"
+		></bean>
+
+		bean作用域：
+		默认情况下 bean 是单例的!
+		但有的时候, bean 就不能使单例的. 例如: Struts2 的 Action 就不是单例的! 可以通过 scope 属性来指定 bean 的作用域
+	
+		prototype: 原型的. 容器初始化时不创建，每次调用 getBean 方法都会返回一个新的 bean. 且在第一次调用 getBean 方法时才创建实例
+		singleton: 单例的. 在容器初始化时就创建bean的实例。每次调用 getBean 方法都会返回同一个 bean. 且在 IOC 容器初始化时即创建 bean 的实例. 默认值。整个容器的生命周期只创建一次。
+		
+		<bean id = "car1" class="spring.beans.autowire.Car">
+			<property name="brand" value="BWM"></property>
+			<property name="price" value="300000"></property>
+		</bean>
+	
+		<bean id = "car2" class="spring.beans.autowire.Car" scope="prototype">
+			<property name="brand" value="BWM"></property>
+			<property name="price" value="300000"></property>
+		</bean>
+	
+		使用外部属性文件
+		<bean id = "dataSource" class = "com.mchange.v2.c3p0.ComboPooledDataSource">
+			<property name="user" value="root"></property>
+			<property name="password" value="123456"></property>
+			<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+			<property name="jdbcUrl" value="jdbc:mysql:///test"></property>
+		</bean>
+	
+			导入外部的资源文件
+		<context:property-placeholder location="classpath:db.properties"/>
+			配置数据源
+		<bean id = "dataSource2" class = "com.mchange.v2.c3p0.ComboPooledDataSource">
+			<property name="user" value="${user}"></property>
+			<property name="password" value="${password}"></property>
+			<property name="driverClass" value="${driverClass}"></property>
+			<property name="jdbcUrl" value="${jdbcUrl}"></property>
+		</bean>
+
+
+		IOC容器中Bean的生命周期
+			调用Bean的初始化方法 -> Bean可以使用
+			当容器关闭时 -> 调用Bean的销毁方法
+
+
+3、工厂方法注入
