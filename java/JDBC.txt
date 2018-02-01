@@ -1,0 +1,203 @@
+一、连接数据库
+   1、Driver:
+     Driver driver = (Driver) Class.forName(driverClass).newInstance();
+     Connection connection = driver.connect(jdbcUrl, info);(info是properties)
+   2、DriverManager(可以管理多个数据库连接)
+     Class.forName(driverClass);(内部的静态代码块已经实例了Driver对象)
+     Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
+
+   3、连接步骤：
+      1)创建Properties对象
+      2)获取jdbc输入流:getClass().getClassLoader().getResourceAsStream("jdbc1.properties");
+        类加载器是从bin文件夹下开始读取
+      3)加载输入流properties.load(in);
+      4)创建4个字符串
+      5)加载驱动Class.forName(driverClass)
+      6)通过DriverManager.getConnection(jdbcUrl, user, password);连接
+
+   4、操作；
+      1)connection连接数据库
+      2)获取statement
+      3)con.executeUpdate执行增删改sql
+      4)resultset接收statement.executeQuery执行查询结果
+      4)关闭
+
+二、PreparedStatmen
+   1、创建preparedStatement，设置占位符
+      String sql = "Insert into customer (name, email, birth) values(?,?,?) "
+      preparedStatement = connection.prepareStatement(sql);
+
+    2、调用setXXX，设置占位符的值
+
+    3、执行sql
+       preparedStatement.executeUpdate();
+
+    4、防止sql注入
+       如：Sql = select * from table where user = ‘a’ OR password = ‘ And password = ‘1’ = ‘1’,可以进去进行
+
+    5、预编译语句有可能反复调用，所以执行之后可以缓存，下次调用时不需要变异，只需要将参数传入编译过的代码中就能得到执行
+
+三、利用反射数据
+    1、ResultSetMetaData:描述 ResultSet的元数据，即从中可以获取到结果集中有多少列，列名是什么
+       (1)ResultSet 关于某个表的信息或一个查询的结果。您必须逐行访问数据行，但是您可以任何顺序访问列。
+       (2)ResultSet 对象的一些最常用方法如下 
+          getInt(int); 将序号为 int 的列的内容作为整数返回。 
+          getInt(String); 将名称为 String 的列的内容作为整数返回。 
+          getFloat(int); 将序号为 int 的列的内容作为一个 float 型数返回。 
+          getFloat(String); 将名称为 String 的列的内容作为 float 型数返回。 
+          getDate(int); 将序号为 int 的列的内容作为日期返回。 
+          getDate(String); 将名称为 String 的列的内容作为日期返回。 
+          next(); 将行指针移到下一行。如果没有剩余行，则返回 false。 
+          Close(); 关闭结果集。 
+          getMetaData(); 返回 ResultSetMetaData 对象。
+  
+       (3)ResultSetMetaData 有关 ResultSet 中列的名称和类型的信息。 
+          getColumnCount(); 返回 ResultSet 中的列数。 
+	  getColumnName(int); 返回列序号为 int 的列名。 
+	  getColumnLabel(int); 返回此列暗含的标签。 
+	  isCurrency(int); 如果此列包含带有货币单位的一个数字，则返回 true。 
+	  isReadOnly(int); 如果此列为只读，则返回 true。 
+ 	  isAutoIncrement(int); 如果此列自动递增，则返回 true。这类列通常为键，而且始终是只读的。 
+	  getColumnType(int); 返回此列的 SQL 数据类型。这些数据类型包括 
+
+    2、步骤：
+       (1)得到 ResultSetMetaData 对象 : resultSet.getMetaData();
+       (2)rsmd.getColumnCount():获取指定列的别名，索引从1开始
+    3、通用查询：
+       (1)使用sql
+       (2)查询，得到ResultSet对象（结果集）
+       (3)得到 ResultSetMetaData 对象，可以知道sql查询了哪些列，以及列的别名是什么(一定是列的别名，有可能列名和Class对应的类的属性名不一致)
+       (4)创建Map<String,Object> 对象，键：查询列的别名，值：列的值       
+       (5)Class对象：Class对应的类的对象
+          Class clazz = Student.class;
+          Object object = clazz.newInstance();
+       (6)反射，为定义的属性赋值
+
+四、DAO：Data Access Object
+   1、包含对数据的增、删、改、查，但不包含任何业务信息
+   2、获取结果集->处理结果集->List<Map<String,Object>>->转化为对象->List<T>
+五、Java类的属性：
+   1、通过get(set)定义属性，去除get(set)后，首字母变小写，为类的属性!!
+   2、之前的属性为成员变量，或者字段
+   3、一般情况下，字段名和属性名一样
+   4、SetProperty()、GetProperty()
+
+六、使用JDBC驱动处理元数据
+   1、通过Connection对象,获取数据库的各种信息
+   2、这些信息时在 的对象上获取的，而 对象是在Connection对象上获取的
+
+七、获取插入数据的主键值
+   1、通过 getGeneratedKeys() 获取包含了新生成的主键的 ResultSet 对象
+      在 ResultSet 中只有一列 GENERATED_KEY, 用于存放新生成的主键值.
+      ResultSet rs = preparedStatement.getGeneratedKeys();
+   
+   2、通过 getGeneratedKeys() 获取包含了新生成的主键的 ResultSet 对象
+      在 ResultSet 中只有一列 GENERATED_KEY, 用于存放新生成的主键值.
+      ResultSetMetaData rsmd = rs.getMetaData();
+
+八、LOB
+   1、用来存储大量的二进制和文本数据的数据类型
+   2、BLOB使用于存储二进制数据，如图像、音频、视频、文件等
+   
+   3、插入 BLOB 类型的数据必须使用 PreparedStatement：因为 BLOB 类型的数据时无法使用字符串拼写的。 
+      调用 setBlob(int index, InputStream inputStream)
+      InputStream inputStream = new FileInputStream("tang.jpeg");
+      preparedStatement.setBlob(4, inputStream);
+
+   4、读取 blob 数据: 
+      使用 getBlob 方法读取到 Blob 对象
+      调用 Blob 的 getBinaryStream() 方法得到输入流。再使用 IO 操作即可. 
+      Blob picture = resultSet.getBlob(4);
+      InputStream in = picture.getBinaryStream();
+      OutputStream out = new FileOutputStream("girl.jpg");
+      byte[] buffer = new byte[1024];
+      int len = 0;
+      while((len = in.read(buffer)) != -1){
+		out.write(buffer, 0, len);
+      }
+
+九、数据库事务
+   1、事务：是指一组逻辑操作单元，使数据从一种状态变换到另一种状态
+   2、数据的操纵是离散的成组的逻辑单元，当它全部完成时，数据一致性可以保持，而单元中的一部分操作失败，整个事务就全部被是为错误
+   3、开始一个事务，对数据作修改操作，如果提交，修改就被保存，如果回退，则会放弃所做的所有修改，回到开始事务时的状态
+   
+   4、数据库的隔离级别：
+     脏读：t1读取了t2更新但还没提交的字段，若t2回滚，则t1度去读取同一字段，值就不同。
+     不可重复读：t1读取了一个字段,t2更新了该字段，t1再次读取，值就不同
+     幻读：t1从一个表中读取一个字段，然后t2在该表插入一些新的行，之后，再读取同一个表，就会多出几行。
+     4种隔离级别：
+	mysql:有4种，默认可重复读
+        oracle:有2种，默认读已提交
+
+   5、mysql隔离级别：
+      (1)每个数据库的连接有一个全局变量@@tx_isolation，表示当前隔离级别
+      (2)查看当前mysql连接的隔离级别：set transaction isolation level read committed;
+      (3)设置数据库系统的全局隔离级别：set global transaction isolation level read committed;
+
+十、批量处理jdbc语句
+   1、addBatch()添加需要处理的sql语句
+   2、executeBatch()执行批量处理语句
+
+十一、数据库连接池
+   1、基本思想：为数据库建立一个“缓冲池”，预先在缓冲池中放入一定数量的连接，当需要建立数据库连接时，只需要从中取出一个，使用完再放回。
+   2、数据库连接池负责分配、管理和释放数据库连接，允许应用重复使用一个现有的数据库连接，而不是重新建立一个
+   3、当应用向连接池的请求的连接数超过最大连接数量，这些请求将被加入等待队列。
+   
+   DataSource dataSource；
+   4、两种数据库连接池：
+      (1)Dbcp:
+         1)BasicDataSource basicDataSource = new BasicDataSource()
+         2)配置文件：DataSource dataSource = BasicDataSourceFactory.createDataSource(properties);
+           driverClassName=com.mysql.jdbc.Driver
+	   url=jdbc:mysql://localhost:3306/test
+           username=
+           password=
+
+	   initialSize=10
+	   maxActive=50
+	   minIdle=5
+	   maxWait=5000
+      (2)C3P0:
+	 1)//ComboPooledDataSource cpds = new ComboPooledDataSource("helloc3p0")
+	   
+ 	   DataSource dataSource = new ComboPooledDataSource("helloc3p0");
+  	   ComboPooledDataSource comboPooledDataSource = (ComboPooledDataSource)dataSource;
+	 2)配置文件：
+  	   <c3p0-config>
+
+		<named-config name="helloc3p0">
+		
+		<!-- 指定连接数据源的基本属性 -->
+		<property name="user">root</property>
+		<property name="password">root</property>
+		<property name="driverClass">com.mysql.jdbc.Driver</property>
+		<property name="jdbcUrl">jdbc:mysql://localhost:3306/test</property>
+		
+		<!-- 若数据库中连接数不足时, 一次向数据库服务器申请多少个连接 -->
+		<property name="acquireIncrement">5</property>
+		<!-- 初始化数据库连接池时连接的数量 -->
+		<property name="initialPoolSize">5</property>
+		<!-- 数据库连接池中的最小的数据库连接数 -->
+		<property name="minPoolSize">5</property>
+		<!-- 数据库连接池中的最大的数据库连接数 -->
+		<property name="maxPoolSize">10</property>
+
+		<!-- C3P0 数据库连接池可以维护的 Statement 的个数 -->
+		<property name="maxStatements">20</property>
+		<!-- 每个连接同时可以使用的 Statement 对象的个数 -->
+		<property name="maxStatementsPerConnection">5</property>
+	
+		</named-config>
+		
+	  </c3p0-config>
+
+十二、DBUtils
+    1、QueryRunner 的 query 方法的返回值取决于其 ResultSetHandler 参数的handle 方法的返回值
+    2、BeanHandler: 把结果集的第一条记录转为创建 BeanHandler 对象时传入的 Class参数对应的对象. 
+    3、BeanListHandler: 把结果集转为一个 List, 该 List 不为 null, 但可能为
+       空集合(size() 方法返回 0)
+       若 SQL 语句的确能够查询到记录, List 中存放创建 BeanListHandler 传入的 Class对象对应的对象. 
+    4、MapHandler: 返回 SQL 对应的第一条记录对应的 Map 对象.键: SQL 查询的列名(不是列的别名), 值: 列的值.
+    5、MapListHandler: 将结果集转为一个 Map 的 List Map 对应查询的一条记录: 键: SQL 查询的列名(不是列的别名), 值: 列的值. 而 MapListHandler: 返回的多条记录对应的 Map 的集合. 
+    6、ScalarHandler: 把结果集转为一个数值(可以是任意基本数据类型和字符串， Date 等)返回
+	 

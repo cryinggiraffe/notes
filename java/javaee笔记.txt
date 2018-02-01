@@ -1,0 +1,478 @@
+一、向上转型：子类型转化为父类型(父类引用指向子类对象)
+      1、Father f = new Son(); 不需要强制转型
+      2、对丢失子类特有的方法，但重写父类的方法
+
+二、向下转型：父类型转化为子类型(子类引用指向父类对象)
+      1、Son s = (Son)father; 需要强制转型
+      例：
+	public boolean eauals(Object object){
+		if(this==object){
+			return true;
+		}else if(object instanceof Circle){
+			Circle circle = (Circle)object;
+			return circle.radius==this.radius;
+		}else{
+			return false;
+		}
+	}
+
+三、对象创建时的内存：声明对象时，在栈中创建了一个引用，当new之后，才在堆空间中分配内存，引用指向堆空间中的地址
+
+四、String的内存：多了一块常量池，所有创建的字符串都在常量池中
+      1、String a = “” String b = “”；此方法创建的字符串，不会在堆空间中新开辟内存，指向的是同一块内存空间，此空间中存的是常量池中字符串的地址。
+      2、String c = new String(“”); 此方法创建的字符串会在堆新开辟内存，与以上的字符串值相同，但堆空间地址不同，但堆空间中存的地址仍然是常量池中字符串的地址。
+
+五、单例模式：只有一个对象，构造私有化，通过其他的静态方法调用
+      1、私有构造
+      2、创建私有对象
+      3、创建公共方法，必须是static
+
+六、Static:存在于静态域中
+      1、随着类的加载而加载，只加载一次，类的加载先于对象
+      2、多个静态代码块之间按顺序执行
+      3、静态代码块先于非静态执行，并且，生命周期要长于非静态，比非静态晚回收
+      4、静态代码块中只执行静态结构
+
+七、非静态代码块：
+      1、可以对静态和非静态的属性进行初始化操作，可以调用静态和非静态方法
+      2、按顺序执行
+      3、每创建一次对象，非静态代码块就加载一次，执行早于构造器
+
+八、创建对象执行顺序：
+      1、从父到子的顺序（从父类的静态到子类的静态）
+      2、先静态后非静态（全部静态执行完，再执行非静态）
+      3、先代码块后构造（先执行完父类中的代码块和构造，后执行子类中的代码块和构造）
+
+九、属性赋值顺序：
+      1、默认赋值，2、显式赋值或者代码块，3、构造器，4、方法赋值
+
+十、final:修饰类、方法、变量
+      1、类不能被继承、方法不能重写
+      2、修饰属性，此属性就是个常量
+      3、static final 全局常量
+      4、final修饰引用变量亦可，如修饰一个对象，对象不可变，但对象中的成员中的非final可以重现赋值，变化。
+
+十一、抽象类：
+      1、不可以实例，但是有构造方法
+      2、不能修饰属性、构造器（构造器不能被重写）、private（子类不能覆盖和重写private的方法）、final（final不能被重写）、static
+
+十二、模版模式：
+      1、抽象类中部分方法没有实现，用子类来实现
+
+十三、接口：
+      1、代表方法的抽象
+
+十四、工厂方法：
+      1、定义一个用于创建对象的接口，，让子类决定实例化哪个类。FactoryMethod使一个类的实例化延迟到子类：Factory f = new 子类（）
+      2、适用于一个类不知道它所创建的对象的类；一个类希望它的子类来指定它所创建的对象；当类将创建对象的职责委托给子类
+
+十五、代理模式：
+      1、为其他对象提供一种代理以控制对这个对象的访问()
+
+十六、内部类：成员内部类和局部内部类
+      1、创建静态内部类: Inner i = new Outer.Inner();
+      2、创建非静态：Outer o = new Outer();
+                  Inner i = o.new Inner();
+
+      3、内部类和外部类的属性调用：先内部（this.属性是内部类属性），后外部（Outer.this.属性）
+      4、局部内部类是方法里的类：若一个方法的返回值为接口或者类，在方法中定义一个类，实现接口，然后返回该类的对象，匿名内部类也可以
+
+面向对象的小结：
+      1、变量的分类：成员变量和局部变量（形参、方法或代码块内部）
+      2、属性赋值：默认初始化、显式初始化、初始化块、构造器初始化、调用方法
+      3、构造器：创建类的对象、初始化
+      4、创建对象内存解析：
+        栈：局部变量、对象引用、数组引用
+        堆：new 出来的东西
+        方法区：字符串常量池
+        静态域：存放在类中的静态变量
+      5、多态：方法的重载和重写
+         子类对象多态性：Person p = new Student();（向上转型）
+         向下转型：Student s = (Student)p; 在这之前要 (p instanceof Student)
+
+      6、this：必须是属性、方法、构造器，表示对象或正在创建的对象
+         Super：显式调用父类的相应结构
+         static
+         Abstract不能修饰属性
+
+异常处理：（try-可能出现的情况，catch-对异常的处理）
+      1、finally：必须执行
+      2、try内的变量类似于局部变量，出了try就不能被调用了
+      3、出现异常后，按顺序与catch匹配，执行后，跳过之后的catch
+      4、异常处理后，其后代码继续执行
+      5、运行时异常可以不显式处理，编译时异常必须显式处理
+      6、同级异常则无所谓，子类异常必须放在父类异常之前
+      7、try-catch可以嵌套
+
+      8、throws：抛出异常，不对异常进行处理，向上抛出，由调用者处理
+      9、throw：手动抛出一个异常，throw new Exception()(throw 异常对象);若是RuntimeException可以不显式处理，若是Exception必须显式处理
+
+      10、自定义异常：需要继承RuntimeException
+      11、子类重写父类方法，抛出的异常只能是被重写方法的异常类的子类或异常类型一致。
+例：
+class MyException extends Exception{}
+class Test{
+	if(){throw new MyExcepti…}
+}
+
+集合：Collection、 Iterator、Map
+      1、Collection:
+         常用方法：addAll将形参中包含的所有元素添加到当前集合中；containsAll判断当前集合是否包含coll所有元素；retainAll求当前集合与coll共有的集合，removeAll同理
+                 元素遍历：iterator():返回一个Iterator接口实现类的对象,iterator.next()，iterator.hasNext()或者用for-each
+         (1)Set：无序，不重复:
+            1）无序性！= 随机性，要求添加进Set的元素必须重写equals和hashcode方法。
+            2）添加对象时，先调用所在类的hashCode方法，计算对象的哈希值，此哈希值决定了从对象在Set中的存储位置，若此位置有元素，再通过equals比较，若不同都存储。
+            HashSet(主要实现类)
+            LinkedHashSet(Linked插入效率低于HashSet,迭代高于HashSet)
+            TreeSet(添加的元素必须同类型、可以按照集合中元素的指定顺序遍历)；自然排序：实现Comparable，重写compareTo方法，此方法中指明用哪个属性排序。向TreeSet中添加元素，首先用compareTo比较，返回0，则认为元素相同，不进行添加。定制排序：实现Comparator。      
+            小技巧：在实现comparator时，类有还有别的类型，如person类里有MyDate类：
+                  if(o1 instanceof Person && 02 instaceof Person){
+    			Person p1 = (Person)o1;
+		        Person p2 = (Person)o2;
+  			MyDate birth1 = p1.getBirthday();
+			MyDate birth2 = p2.getBirthday();
+			if(birth1.getYear()!=birth2.getYear()){
+				return birth1.getYear()!=birth2.getYear()
+			}else{…逐层比较}
+                  }
+            
+         (2)List：有序，可重复：ArrayList(数组实现),LinkedList(链表实现),Vector
+           增(add);删;改(set);查(get);插(add(index,element));subList(从first到to，左闭右开)
+
+   
+      2、Map:具有映射关系，key-value（key和value可以是任意值）
+        （1）key用Set存放，不允许重复，Map对象所对应的类要重写hashCode和equals
+         (2)常用String作为Map的key
+         (3)key和value一一对应
+
+         HashMap:
+            1)向其中添加元素时，会调用key所在类的equals方法，若相同则添加后面的元素。putAll(Map t)同上的All方法。
+            2)遍历：遍历key:Set set = map.keySet();遍历value：collection values = map.values();
+                   遍历key-value：先获取key，后通过get()获得值；或者：
+                   Set set = map.entrySet(); 
+                   for(Object o : set){
+                       Map.Entry entry = (Map.Entry)o 
+                       entry.getKey entry.getValue
+                   }
+   
+         LinkedHashMap:使用链表维护map的顺序
+
+         TreeMap:按照添加Map中的元素的key的指定属性进行排序，key必须是同一类型
+                 自然排序和定制排序与TreeSet相同
+
+         Hashtable：线程安全，和HashMap一样，但不允许使用null
+
+         Properties:常用来处理属性文件，key和value的都是String
+
+         (5)Map.Entry是Map声明的一个内部接口，此接口为泛型，定义为Entry<K,V>。它表示Map中的一个实体（一个key-value对）。接口中有getKey(),getValue方法。
+         Map提供了一些常用方法，如keySet()、entrySet()等方法。keySet()方法返回值是Map中key值的集合；entrySet()的返回值也是返回一个Set集合，此集合的类型为Map.Entry。
+
+     3、Collections工具类：
+  	reverse:反转，shuffle：对集合元素随机排序,sort, swap，，max，min，copy(list1,list2)(list2复制到list1)，frequency()统计出现次数，synchronizedList()：多个线程操作list，保证线程安全
+  
+泛型：没有泛型会造成类型转换异常（不指定的时候，默认object）
+     核心：集合中使用泛型，就是把集合中的内容限定为特定的数据类型
+     1、泛型类：class A<T>{ private T t…  public void test(T t)}
+     2、泛型接口：interface A<T>{…}
+     3、泛型方法：public <E> E getE(E e){return e}，泛型方法中的类型和泛型类中定义的方法不一定相同
+    
+     4、泛型和继承的关系：List<son>不是List<father>的子接口；
+     5、通配符?:List<A>，List<B>...都是List<?>的子类，？是具体类型的父类
+              ? extends A：可以存放A和A的子类
+              ? super A：可以存放A及其父类
+     6、静态方法不能使用类的泛型(静态方法随着类的加载而加载，但泛型变量则是随着对象的加载而加载，生命周期不同)
+     7、catch中不能使用泛型
+     8、可以遍历声明为通配符的集合类对象（将其他的集合对象赋值给通配符集合对象），但不允许向其中写入对象（不能直接使用add方法，添加元素）
+
+枚举：
+   1、定义：
+   enum A{
+	A,B,C;
+        //A(),B(),C();
+        //A(){},B(){},C(){};	
+   }
+   2、values():获取枚举类中所有的对象，valueof
+   3、可以实现接口
+
+注解：
+   1、常用注解：
+      Override:限定重写父类方法，只能用于方法
+      Deprecated：某个程序元素（类、方法）已经过时
+      SuppressWarnings：抑制编译器警告
+
+   2、自定义注解：
+      @interface MyAnntation
+
+   3、注解上的注解类型:
+      Retention:修饰生命周期，RetentionPolicy（SOURCE,CLASS,RUNTIME）
+      Target:确定注解能修饰哪些成员变量（类、变量、方法...）
+      Document:生成文档，被javadoc提取
+      Inherited:修饰的注解有继承性
+    
+IO:
+   1、路径：／或者\\;
+   2、相对路径：相对于最外层项目文件夹，不是内层的src文件夹
+   
+   3、File的对象对应一个文件或者文件夹。File中的方法仅涉及创建、删除、重命名等，不能对文件内容进行操作，要使用流。其对象作为流的形参
+   4、mkdir:上层文件夹存在，创建文件夹，mkdir:上层文件夹不存在也可以创建，上层文件夹一并创建
+   5、list()列出文件名,返回值String[]，listFiles返回File[];
+
+   (字节流)：
+   6、FileInputStream:
+     1）read()返回值为-1时读取结束
+     2）read(byte[] b)返回从数组中读取的元素个数,要创建一个len，来存读取元素个数
+  
+   7、FileOutputStream：向一个文件中写，若文件不存在，自动创建，若已存在会覆盖
+     1)读取：wirte(b,0,len);
+
+   (字符流)
+   8、FileReader、FileWriter用法同上。用于文本文件。非文本文件（视频、音频、图片）用字节流
+   
+   9、BufferedInstream、BufferedOutStream，缓冲流
+     1)处理的是FileInputStream
+     2)写入时，需要加flush(),才能保证最后一个写入完成
+
+   10、BufferedReader、BufferedWriter中可以使用readline
+     读：while((str=br.readLine())!=null){
+     		bw.write(str);
+		bw.newLine();
+		bw.flush();
+     }
+
+   11、转换流：InputStreamReader:字节到字符的桥梁；OutputStreamWriter:字符到字节的桥梁
+      1)解码：字节数组->字符串
+      2)编码：字符串->字节数组
+      字节流System.in转为字符流BufferedReader
+      字符流BufferedReader转为字节流System.out
+
+   12、标准输入输出流：
+      1)System.in是InputStream类型（抽象类）；
+
+   13、打印流：
+      1)PinterStream:之前的out、printf，是输出控制台，用打印流是输出到文件。	
+
+   14、数据流：方便操作基本数据类型
+
+   15、对象流：
+      1)序列化：把内存中的对象转换成平台无关的二进制流，并且可以持久保存在磁盘上，或者通过网络将这种二进制流传输到另一个网络节点。当其他程序获取了二进制流，就恢复成原来的java对象。
+      2)所有的类都要需要实现Serializable接口
+      3)对象转化为字节数据
+      4)private final static long serialVersionUID用来表明不同版本的兼容性。当代码修改时，UID可能会发生改变，所以建议显示声明。
+      5)static和transient不能实现序列化。
+
+   16、RandomAccessFile：随机访问、可以在文件的任意地方读写文件->既是输入也是输出
+      1）构造器里的模式：r、rw、rwd（读写、文件内容更新）、rws（读写、文件内容更新、元数据更新）
+      2）默认是覆盖
+
+多线程：一个进程的多个执行路径
+   1、继承Thread，重写run()，创建子类对象，调用start->启动线程;调用run。一个线程只能执行一次start。并且只能通过start启动线程，不能通过run启动线程。
+
+   2、常用方法：
+     1)currentThread.静态，调取当前线程
+     2)getName.获取线程的名字
+     3)setName.设置线程的名字
+     4)yield.释放当前CPU的执行权
+     5)join.在A线程中调用B的join，但执行到此方法时，A停止，直到B执行完毕。
+     6)isAlive
+     7)sleep
+
+     8)线程通信：wait、notify、notifyAll
+     
+     9)线程优先级
+
+   3、利用Runnable创建线程:
+     1)创建接口实现类的对象，将对象传入Thread类的构造器中，创建Thread的对象。
+     2)可以避免单继承
+     3）多个线程同一份资源，更适合使用。实例一个对象，多个线程对一个对象进行操作。
+        也存在线程安全问题:多个线程处理共享数据时，未执行完毕时，其他线程参与进来，导致共享数据存在安全问题
+
+   4、线程分类：
+     1)守护线程：jvm、垃圾回收
+   5、新建->就绪（start）
+      运行->就绪（yield）
+      运行->阻塞（sleep、wait/join、suspend）
+      阻塞->就绪（notify\resume）
+
+   6、对于多线程的安全问题，提供了同步代码块:synchronized
+     1)同步代码块：synchronized(锁){}:
+       锁：由任意的对象来实现；设置为全局变量，否则每个线程就会拥有一个锁，而不是公用一个锁
+          所有线程使用唯一一把锁
+          包住的东西就是共用的方法
+     2)同步方法：public synchronized void show(String name){}
+       将操作共享数据的方法声明为synchronized；同步方法的锁是当前对象。
+       对于静态方法，使用当前类本身充当锁
+
+   7、释放锁的操作
+
+   8、死锁
+
+   9、线程通信：在synchronized中使用
+     wait:当前线程挂起并放弃资源，使别的线程可访问共享资源，而当前线程排队等候再次对资源的访问。
+     notify:唤醒正在排队的线程中优先级最高的者结束等待。
+     notifyAll:唤醒正在排队的所有线程结束等待。
+
+常用类
+   1、String:
+     1)字符串是不可变的字符序列，底层用char[]存放、是final。
+     2)字符串拼接->重新在常量池中构造字符串的对象
+     3)例：
+       String str3 = "java" + "android"; //在常量池中新创建了对象str3
+       String str4 = str1 + str2;  //对象拼接:str3!=str4
+       String str5 = str4.intern();  //仅仅是字符串的值拼接:与str3相同
+     4)对象中的字符串属性同理：
+       虽然在堆内开辟两块内存，栈空间的中的引用地址不同，但堆空间的属性所指向的常量池中的地址相同：
+       p.name ==p.name
+
+   2、常用方法：(String 没有reverse！)
+      char charAt(int index):返回指定位置的字符
+      int indexof(String s):返回s在当前字符串中首次出现的位置
+      int lastindexof(String s):返回s在当前字符串中最后出现的位置 
+      Boolean regionMatches(int firstStart, String other, int otherStart, int len):从firstStart开始的字串，和otherStart从otherStart开始，len长度的字符串是否相等
+
+      String substring(int start):返回从start开始的字串
+      String replace(char old, char new):替换字符串中旧的字符串
+      String trim():去除首尾的空格
+      String concat(String str):连接str
+      String[] split(String s):按照s将当前字符串 拆分成多个字符串，每个字符串不包含s
+  
+
+   3、字符串和基本类型的转换：
+     1)字符串->基本数据类型：想用包装类的parsexxx()
+     2)基本数据类型->字符串：String.valueof()
+     
+     3)字符串->字节数组:getBytes()
+     4)字节数组->字符串:字符串的构造器
+
+   4、StringBuffer：可变的字符序列
+     1)增：append、删：delete、改：setCharAt(int index, char ch)、查：charAt(int n);
+          Insert() reverse()
+
+   5、StringBuilder：可变的字符序列,线程不安全，效率高
+      效率：StringBuilder>StringBuffer>String
+
+   6、Date的两种构造器
+      SimpleDateFormat sdf = new SimpleDateFormat();		
+      //日期->文本
+      String date = sdf.format(new Date());
+      //文本->日期
+      Date date2 = sdf.parse("17-7-25 下午9:57");
+       
+   7、Calendar:
+     Calendar c = Calendar.getInstance();
+     get set 
+
+   8、BigInteger、BigDecimal
+
+反射：
+   1、Person p = (Person)clazz.newInstance();//创建对象
+
+   2、创建一个类，通过编译(javac.exe),生成对应的.class文件，使用java.exe加载（JVM的类加载器）.class文件。当文件加载到内存后，就是一个运行时类，存在缓冲区。运行时类就是一个Class实例。
+   3、每个运行时类只加载一次。
+
+   4、通过Class的实例：
+      1)创建运行时类的对象
+      2)获取运行时类的完整结构
+      3)获取运行时类的指定结构
+      4)动态代理
+   
+   5、获取Class的实例
+      1)通过运行类本身:Class clazz1 = Person.class;
+      2)通过运行类的对象:Class clazz2 = p.getClass();
+      3)Class的静态方法:Class clazz3 = Class.forName(className);
+      4)类的加载器
+        工程下：
+        ClassLoader loader = this.getClass().getClassLoader();
+	InputStream is = loader.getResourceAsStream("day16/jdbc.properties");
+	Properties pros = new Properties();
+	pros.load(is);
+	String name = pros.getProperty("user");
+
+        当前目录下:
+      	FileInputStream is = new FileInputStream(new File("jdbc.properties"));
+	Properties pros = new Properties();
+	pros.load(is);
+	String name = pros.getProperty("user");
+
+   6、运行时类的对象
+      1)使用newInstance()，实际上调用了运行类的空惨构造器。要求运行类有空参构造器，权限足够。
+
+   7、运行时类的属性
+      1)getFields():获取父类、子类的public属性
+      2)getDeclaredFields():获取类本身的所有属性
+       //1、获取指定属性
+	Field name = clazz.getField("name");
+	//2、创建运行时类的对象
+	Person p = (Person)clazz.newInstance();
+	System.out.println(p);
+	//3、运行时类的赋值
+	name.set(p, "tang");
+
+   8、运行时类的方法
+	Method m1 = clazz.getMethod("eat1");
+	Person p = (Person)clazz.newInstance();
+	m1.invoke(p);
+
+   9、运行时类的构造方法
+	Class clazz = Class.forName(className);
+	Constructor cons = clazz.getDeclaredConstructor(List.class);
+	cons.setAccessible(true);
+	Person p = (Person)cons.newInstance(new ArrayList());
+
+   10、动态代理：通过一个代理类完成全部代理功能
+      代理模式:一个代理类只能为一个借口服务，会产生多个代理。
+      动态创建目标类的代理对象
+
+      1)给被代理的对象实例化，返回一个代理类对象
+	public Object blind(Object obj){
+		this.obj = obj;
+		return Proxy.newProxyInstance(obj.getClass().getClassLoader(), obj.getClass().getInterfaces(), this);
+	}
+      2)当通过代理类的对象发起对被重写方法的调用，都会转化为invoke调用
+	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		Object returnVal = method.invoke(obj, args);
+		return returnVal;
+	}
+
+      3)实现：
+	//创建被代理类
+        RealSubject real = new RealSubject();
+	//动态代理	
+	MyInvocationHandler handler = new MyInvocationHandler();
+	//创建动态代理类对象
+	Object obj = handler.blind(real);
+	Subject sub = (Subject)obj;
+	//调用	
+	sub.action();
+
+
+网络：
+    1、InetAddress:获取ip地址、主机名称、端口号
+    2、Socket:ip地址和端口号的组合
+      允许把网络连接当成一个流
+
+    3、TCP：
+       客户端：
+       (1)创建Socket对象，构造服务端的ip和端口号
+       (2)getOutputStream()发送数据
+       (3)写入数据、关闭流
+       服务端：
+       (1)创建ServerSocket对象，构造自身的端口号
+       (2)调用accept()，返回Socket的对象
+       (3)通过Socket的对象的getInputStream()获取输入流
+
+       若要交互，还需要让客户端显示告诉服务端发送完毕
+
+    4、数据报：
+      客户端：
+       (1)创建DatagramPacket构造数据报，地址、端口号
+       (2)创建DatagramSocket对象，调用send()发送数据
+       (3)关闭流
+       服务端：
+       (1)创建DatagramPacket构造数据报
+       (2)创建DatagramSocket对象，构造端口号，
+       (3)调用receive()获取输入流
+
+    5、URL：
+       (1)openStream:从网络上读取数据
+       (2)用户向服务器发送消息。使用URLConnection，与URL对象建立连接：openConnection
+       (3)URLConnection里有输入输出流

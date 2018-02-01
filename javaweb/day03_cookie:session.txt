@@ -1,0 +1,143 @@
+一、Cookie(也是一个k-v健值对，但只有一对)
+   一个用户的所有请求操作都应该属于同一个会话，而另一个用户的所有请求操作则应该属于另一个会话，二者不能混淆。
+   HTTP协议是无状态的协议。一旦数据交换完毕，客户端与服务器端的连接就会关闭，再次交换数据需要建立新的连接。
+   
+   Cookie实际上是一小段的文本信息。客户端请求服务器，如果服务器需要记录该用户状态，就使用response向客 户端浏览器颁发一个Cookie。客户端浏览器会把Cookie保存起来。当浏览器再请求该网站时，浏览器把请求的网址连同该Cookie一同提交给服务 器。服务器检查该Cookie，以此来辨认用户状态。服务器还可以根据需要修改Cookie的内容。
+   
+   使用 Cookie 类代表 cookie
+   1. 从浏览器获取 Cookie
+   Cookie [] cookies = request.getCookies();
+   
+   2. 获取 Cookie 的 name 和 value
+   cookie.getName() 
+   cookie.getValue()
+
+   3. 创建一个 Cookie 对象
+   Cookie cookie = new Cookie("name", "atguigu");
+   //setMaxAge: 设置 Cookie 的最大时效, 以秒为单位, 若为 0 , 表示立即删除该 Cookie
+   //若为负数, 表示不存储该 Cookie, 若为正数, 表示该 Cookie 的存储时间. 
+   cookie.setMaxAge(30);
+			
+   //调用 response 的一个方法把 Cookie 传给客户端. 
+   response.addCookie(cookie);
+   
+   补：删除一个cookie:要想修改Cookie只能使用一个同名的Cookie来覆盖原来的Cookie，达到修改的目的。删除时只需要把maxAge修改为0即可:
+   Cookie cookie = new Cookie("username","helloweenvsfei");   // 新建Cookie
+   cookie.setMaxAge(0);                          // 设置生命周期为0，不能为负数
+   response.addCookie(cookie);                    // 必须执行这一句
+
+   4、Cookie的路径
+     //Cookie 的 作用范围: 可以作用当前目录和当前目录的子目录. 但不能作用于当前目录的上一级目录. 
+     //可以通过 setPath 方法来设置 Cookie 的作用范围, 其中 / 代表站点的根目录. 
+     (1)向客户端浏览器写入一个 Cookie: cookiePath, cookiePathValue
+     //设置 Cookie 的作用范围：
+     cookie.setPath(request.getContextPath());  
+
+     读取一个 name 为 cookiePath 的 Cookie
+     if("cookiePath".equals(cookie.getName())){
+	cookieValue = cookie.getValue();	
+     }
+
+
+二、Session
+   Session是服务器端使用的一种记录客户端状态的机制
+   Session是另一种记录客户状态的机制，不同的是Cookie保存在客户端浏览器中，而Session保存在服务器上。客户端浏览器访问服务器的时候，服务器把客户端信息以某种形式记录在服务器上。
+   Cookie机制是通过检查客户身上的“通行证”来确定客户身份的话，那么Session机制就是通过检查服务器上的“客户明细表”来确认客户身份。Session相当于程序在服务器上建立的一份客户档案，客户来访的时候只需要查询客户档案表就可以了。
+
+   1、产生HttpSession对象的过程：
+     Session对应的类为javax.servlet.http.HttpSession类。每个来访者对应一个Session对象，所有该客户的状态信息都保存在这个Session对象里。Session对象是在客户端第一次请求服务器的时候创建的。 
+     Session也是一种key-value的属性对，通过getAttribute(Stringkey)和setAttribute(String key，Objectvalue)方法读写客户状态信息。Servlet里通过request.getSession()方法获取该客户的 Session
+
+   2、使用Cookie跟踪Session：session通过SessionID来区分客户,系统会创造一个JSESSIONID的输出cookie,称为session cookie,session cookie是存储在浏览器内存中，并不是写到硬盘上，通常看不到JSESSIONID
+
+   3、生命周期
+     (1)创建 HttpSession 对象
+        默认情况下, 第一次访问一个 WEB 应用的一个 JSP 页面时, 该页面都必须有一个和这个请求相关联的 Session 对象. 因为 page 指定的 session 属性默认为 true
+
+       常见错误：在客户端被访问时，session就被创建。
+       1)若当前的 JSP 是客户端访问的当前 WEB 应用的第一个资源，且 JSP 的 page 指定的 session 属性值为 false, 则服务器就不会为 JSP 创建一个 HttpSession 对象;
+       2)若当前 JSP 不是客户端访问的当前 WEB 应用的第一个资源，且其他页面已经创建一个 HttpSession 对象，
+则服务器也不会为当前 JSP 页面创建一个 HttpSession 对象，而回会把和当前会话关联的那个 HttpSession 对象返回给当前的 JSP 页面.
+       3)对于 Serlvet: 若 Serlvet 是客户端访问的第一个 WEB 应用的资源,则只有调用了request.getSession() 或 request.getSession(true) 才会创建 HttpSession 对象
+
+     (2)page 指令的 session=“false“  到底表示什么意思？
+        当前 JSP 页面禁用 session 隐含变量！但可以使用其他的显式的 HttpSession 对象
+	
+     (3)在 Serlvet 中如何获取 HttpSession 对象？
+
+	> request.getSession(boolean create): 
+	
+        create 为 false, 若没有和当前 JSP 页面关联的 HttpSession 对象, 则返回 null; 若有, 则返回 true	
+	create 为 true, 一定返回一个 HttpSession 对象. 若没有和当前 JSP 页面关联的 HttpSession 对象, 则服务器创建一个新的HttpSession 对象返回, 若有, 直接返回关联的. 
+	
+	> request.getSession(): 等同于 request.getSession(true)
+
+      (4)销毁 HttpSession 对象:
+       1). 直接调用 HttpSession 的 invalidate() 方法: 该方法使 HttpSession 失效
+
+       2). 服务器卸载了当前 WEB 应用. 
+
+       3). 超出 HttpSession 的过期时间.
+
+	> 设置 HttpSession 的过期时间: session.setMaxInactiveInterval(5); 单位为秒
+	
+	> 在 web.xml 文件中设置 HttpSession 的过期时间: 单位为 分钟. 
+	
+	<session-config>
+    	    <session-timeout>30</session-timeout>
+        </session-config>
+    
+④. 并不是关闭了浏览器就销毁了 HttpSession. 
+
+   4、API:
+      (1)获取Session对象：request.getSession(boolean create);或request.getSession();
+         HttpSession session = request.getSession(true);
+
+      (2)属性相关：setAttribute,getAttribute,removwAttribute,
+
+      (3)HttpSession失效：
+         session.invalidate();
+
+      (4)最大时效, 默认为 30 分钟. 
+	 session.getMaxInactiveInterval();
+
+   
+  5、URL重写
+     URL地址重写是对客户端不支持Cookie的解决方案。URL地址重写的原理是将该用户Session的id信息重写到URL地址中。服务器能够解析重写后的URL获取Session的id。这样即使客户端不支持Cookie，也可以使用Session来记录用户状态。
+     <a href="<%=response.encodeURL("index.jsp") %>">
+
+三、session使用
+   
+   1. 表单的重复提交
+      1). 重复提交的情况: 
+	①. 在表单提交到一个 Servlet, 而 Servlet 又通过请求转发的方式响应一个 JSP(HTML) 页面, 此时地址栏还保留着 Serlvet 的那个路径, 在响应页面点击 "刷新" 
+	②. 在响应页面没有到达时重复点击 "提交按钮". 
+	③. 点击 "返回", 再点击 "提交"
+
+      2). 不是重复提交的情况: 点击 "返回", "刷新" 原表单页面, 再 "提交"。
+
+      3). 如何避免表单的重复提交: 在表单中做一个标记, 提交到 Servlet 时, 检查标记是否存在且是否和预定义的标记一致, 若一致, 则受理请求,并销毁标记, 若不一致或没有标记, 则直接响应提示信息: "重复提交" 
+
+	①. 仅提供一个隐藏域: <input type="hidden" name="token" value="atguigu"/>. 行不通: 没有方法清除固定的请求参数. 
+	②. 把标记放在 request 中. 行不通, 因为表单页面刷新后, request 已经被销毁, 再提交表单是一个新的 request.
+	③. 把标记放在 session 中. 可以！
+
+	> 在原表单页面, 生成一个随机值 token
+	> 在原表单页面, 把 token 值放入 session 属性中
+	> 在原表单页面, 把 token 值放入到 隐藏域 中.
+
+	> 在目标的 Servlet 中: 获取 session 和 隐藏域 中的 token 值
+	> 比较两个值是否一致: 若一致, 受理请求, 且把 session 域中的 token 属性清除
+	> 若不一致, 则直接响应提示页面: "重复提交"
+
+    2. 使用 HttpSession 实现验证码
+
+      1). 基本原理: 和表单重复提交一致:
+
+	> 在原表单页面, 生成一个验证码的图片, 生成图片的同时, 需要把该图片中的字符串放入到 session 中. 
+	> 在原表单页面, 定义一个文本域, 用于输入验证码. 
+
+	> 在目标的 Servlet 中: 获取 session 和 表单域 中的 验证码的 值
+	> 比较两个值是否一致: 若一致, 受理请求, 且把 session 域中的 验证码 属性清除
+	> 若不一致, 则直接通过重定向的方式返回原表单页面, 并提示用户 "验证码错误"
+		
