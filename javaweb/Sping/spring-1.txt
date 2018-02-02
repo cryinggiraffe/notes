@@ -228,4 +228,61 @@ ctx.getBean(Hello.class); 不需强转，要求只有一个该类型的bean
 	但实际返回的实例是 FactroyBean 的 getObject() 返回的实例
 	<bean id = "car" class = "spring.beans.factorybean.CarFactoryBean"></bean>
 
+4、通过注解配置
 
+	配置自动扫描的包
+	<context:component-scan base-package="spring.beans.annotation"></context:component-scan>
+
+	扫描spring.beans.annotation包下，repository目录下所有类
+	<context:component-scan base-package="spring.beans.annotation" resource-pattern="repository/*.class">
+	</context:component-scan>
+
+	配置自动扫描的包，context:exclude-filter 子节点自动排除哪些表达式的组件
+	<context:component-scan base-package="spring.beans.annotation">
+	    排除包
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+		排除类，或接口及其实现类
+		<context:exclude-filter type="assignable" expression="org.springframework.stereotype.Repository.UserRepository"/>
+	</context:component-scan>
+
+	配置自动扫描的包，context:include-filter 子节点只包含哪些表达式的组件
+	<context:component-scan base-package="spring.beans.annotation" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+		<context:include-filter type="assignable" expression="org.springframework.stereotype.Repository.UserRepository"/>
+	</context:component-scan>
+
+	注解：
+		@Controller
+		@Service
+		@Repository("userRepository")
+
+		自动装配：
+		@Autowired ->自动装配单个 Bean 的属性。不允许被装配的属性，require = false;
+		若有多个类型兼容 bean 时：
+			1、@Repository("userRepository") -> 指定名字；或者bean 的名字和属性名相同
+			2、@Qualifier("userRepositoryImpl") -> 指定的 Bean (类是大写，开头小写)
+
+		为数组类型装配：把所有符合配型的 bean 都装配进来。
+		集合属性：读取集合信息。然后装配
+		Map：key是String，Bean的名字作为健，自动装配与Map值类型的Bean
+
+
+5、泛型依赖注入
+	父类中添加bean的关系
+	public class BaseService<T> {
+	
+		@Autowired
+		protected BaseRepository<T> repository;
+	}
+
+	子类放入IOC容器中
+	@Service
+	public class UserService extends BaseService<User>{
+
+	}
+	@Repository
+	public class UserRespository extends BaseRepository<User>{
+
+	}
+
+	
