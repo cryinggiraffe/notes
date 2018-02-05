@@ -1,0 +1,50 @@
+AOP：
+1、问题：
+	代码混乱：增加了很多非业务需求，如日志和验证。
+	代码分散：在多个模块中多次重复。
+
+2、动态代理：
+	使用一个代理将对象包装起来，然后用该代理对象取代原始对象。任何对原始对象的调用都要通过代理。代理对象决定是否以及何时将方法调用转到原始对象上。
+
+	public ArithmeticCalculator getLoggingProxy(){
+		
+		//代理的对象
+		ArithmeticCalculator proxy = null;
+		
+		
+		//一般情况下，使用 new 创建一个对象，其实是使用默认的类加载器
+		//代理对象由哪个类加载器加载
+		ClassLoader loader = target.getClass().getClassLoader();
+
+		//代理对象的类型，即其中的方法
+		Class []interfaces = new Class[]{ArithmeticCalculator.class};
+		
+		InvocationHandler h = new InvocationHandler() {
+			
+			/**
+			 * proxy: 代理对象。 一般不使用该对象
+			 * method: 正在被调用的方法
+			 * args: 调用方法传入的参数
+			 */
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args)
+					throws Throwable {
+				// TODO Auto-generated method stub
+				System.out.println("invoke");
+				return null;
+			}
+		};
+		
+		
+		proxy = (ArithmeticCalculator) Proxy.newProxyInstance(loader, interfaces, h);
+		return proxy;
+	}
+
+3、AOP术语：
+	切面：横切关注点（跨越应用程序多个模块的功能）被模块化的特殊对象
+	通知：切面必须完成的工作（切面里的每个方法）
+	目标：被通知的对象
+	代理：向目标对象应用通知后创建的对象
+	连接点：程序执行的特定位置 -> 方法执行前或后的位置，或者抛出异常
+	切点：程序用有多个连接点，通过切点定位到连接点。
+	类比：连接点相当于数据库中的记录，切点相当于查询条件
