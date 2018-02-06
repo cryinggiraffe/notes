@@ -64,6 +64,89 @@ Maven
       典型例子：servlet-api.jar
 
 
+9、生命周期
+   Default 生命周期：
+      Default 生命周期是 Maven 生命周期中最重要的一个，绝大部分工作都发生在这个生命周期中。
 
+   Maven 核心程序：不论执行生命周期的哪一个阶段，都是从这个生命周期最初的位置开始执行
 
+   插件和目标：
+      生命周期的各个阶段仅仅定义了要执行的任务
+      各个阶段和插件的目标是对应的
+      相似的目标由特定的插件完成
 
+      生命周期：compile
+      插件目标：compile (调用插件的命令)
+      插件：maven-compile-plugin
+
+9、eclipse 中插件不稳定，所以使用内部的的Maven 核心程序
+   （1）插件 - > 在 installations 中导入，Add 
+   （2）User Setting：指定conf/setting.xml的，进而制定本地仓库
+
+10、eclipse 中创建 maven 项目
+   （1）若不能直接创建 Maven 项目，可以在 window -> customize -> mean visibility - >file -> new 勾选maven 项目
+   （2）运行 maven 命令：右键 pom 文件，运行，compile 需要手动输入
+
+11、eclipse 创建 web 项目
+   （1）创建 Maven
+   （2）右键项目 -> properties -> project Facts 选择动态网页
+   （3）可以在 pom 文件中添加依赖，而不用添加运行环境，直接运行为run service
+
+12、
+
+5.第三个Maven工程
+   ①设置通过Maven创建的工程的JDK版本——一劳永逸
+      [1]打开settings.xml文件
+      [2]找到profiles标签
+      [3]加入如下配置
+         <profile>
+            <id>jdk-1.7</id>
+            <activation>
+               <activeByDefault>true</activeByDefault>
+               <jdk>1.7</jdk>
+            </activation>
+            <properties>
+               <maven.compiler.source>1.7</maven.compiler.source>
+               <maven.compiler.target>1.7</maven.compiler.target>
+               <maven.compiler.compilerVersion>1.7</maven.compiler.compilerVersion>
+            </properties>
+         </profile>
+   ②工程坐标
+      groupId：com.atguigu.maven
+      ArtifactId：MakeFriends
+      Package：com.atguigu.maven
+   ③在src/main/java中新建类com.atguigu.maven.MakeFriends
+      public String makeFriends(String name){
+         HelloFriend friend = new HelloFriend();
+         friend.sayHelloToFriend("litingwei");
+         String str = "Hey,"+friend.getMyName()+" make a friend please.";
+         System.out.println(str);
+         return str;
+      }
+   ④在src/test/java中新建类com.atguigu.maven.MakeFriendsTest
+      package com.atguigu.maven;
+      import static junit.framework.Assert.assertEquals;
+      import org.junit.Test;
+      public class MakeFriendsTest {
+         @Test
+         public void testMakeFriends(){      
+            MakeFriends makeFriend = new MakeFriends();
+            String str = makeFriend.makeFriends("litingwei");
+            assertEquals("Hey,John make a friend please.",str);
+         }
+      }
+   ⑤添加依赖信息
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.9</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.atguigu.maven</groupId>
+         <artifactId>HelloFriend</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+         <type>jar</type>
+         <scope>compile</scope>
+      </dependency>
+   ⑥在Eclipse环境下执行Maven命令：右击pom.xml选择run as 中的命令执行即可

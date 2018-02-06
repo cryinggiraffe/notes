@@ -1,9 +1,9 @@
 AOP：
-1、问题：
+一、问题：
 	代码混乱：增加了很多非业务需求，如日志和验证。
 	代码分散：在多个模块中多次重复。
 
-2、动态代理：
+二、动态代理：
 	使用一个代理将对象包装起来，然后用该代理对象取代原始对象。任何对原始对象的调用都要通过代理。代理对象决定是否以及何时将方法调用转到原始对象上。
 
 	public ArithmeticCalculator getLoggingProxy(){
@@ -40,7 +40,7 @@ AOP：
 		return proxy;
 	}
 
-3、AOP术语：
+三、AOP术语：
 	切面：横切关注点（跨越应用程序多个模块的功能）被模块化的特殊对象
 	通知：切面必须完成的工作（切面里的每个方法）
 	目标：被通知的对象
@@ -48,3 +48,116 @@ AOP：
 	连接点：程序执行的特定位置 -> 方法执行前或后的位置，或者抛出异常
 	切点：程序用有多个连接点，通过切点定位到连接点。
 	类比：连接点相当于数据库中的记录，切点相当于查询条件
+	
+	@Component：将该类放入 IOC 容器中。
+
+	1、AOP步骤
+		（1）在配置文件中加入 aop 命名空间
+
+		（2）基于注解方式：
+			1）在配置文件中加入配置：
+				<!-- 配置自动为匹配 aspectJ 注解的 Java 类生成代理对象 -->
+				<aop:aspectj-autoproxy></aop:aspectj-autoproxy>		
+			
+			2）把横切关注点的代码抽象到切面的类中
+				切面是一个 bean,加上 @Component
+				还需要加 @Aspect
+
+			//把该类声明为一个切面：需要把类放入IOC容器中，再声明为一个切面
+			@Aspect
+			@Component
+
+		（3）在类中加入通知 （* ->任意，任意返回值，任意函数，任意类）
+			
+			声明该方法是一个前置通知（方法）：在目标方法开始之前执行
+			@Before(value = "execution(public int spring.aop.impl.ArithmeticCalculatorImpl.add(int , int))")
+			public void beforeMethod(){
+			}
+
+			在通知方法中声明一个 JoinPoint 的参数，可以访问连接细节，如方法名和参数列表
+
+			后置通知：在目标方法执行后（无论是否发生异常），执行的通知
+			//后置通过之中还不能访问目标方法执行的结果
+			@After("execution(public int spring.aop.impl.ArithmeticCalculatorImpl.*(int , int))")
+			public void afterMethod(JoinPoint joinPoint){
+				String methodName = joinPoint.getSignature().getName();
+				List<Object> args = Arrays.asList(joinPoint.getArgs());
+				System.out.println("end" + methodName + args);
+			}
+
+			//返回通知：
+			/**
+			 * 在方法法正常结束受执行的代码
+			 * 返回通知是可以访问到方法的返回值的!
+			 */
+			@AfterReturning(value="execution(public int spring.aop.test.ArithmeticCalculatorImpl.*(int , int))",
+					returning = "result")
+			public void afterReturning(JoinPoint joinPoint, Object result){
+				String methodName = joinPoint.getSignature().getName();
+				System.out.println("The method: " + methodName + " ends with " + result);
+			}
+			
+			//异常通知
+			/**
+			 * 在目标方法出现异常时会执行的代码.
+			 * 可以访问到异常对象; 且可以指定在出现特定异常时在执行通知代码
+			 */
+			@AfterThrowing(value = "execution(public int spring.aop.test.ArithmeticCalculatorImpl.*(int , int))",
+					throwing = "e")
+			public void afterThrowing(JoinPoint joinPoint, Exception e){
+				String methodName = joinPoint.getSignature().getName();
+				System.out.println("The method " + methodName + " occurs excetion:" + e);
+			}
+			
+			/**
+			 * 环绕通知需要携带 ProceedingJoinPoint 类型的参数. 
+			 * 环绕通知类似于动态代理的全过程: ProceedingJoinPoint 类型的参数可以决定是否执行目标方法.
+			 * 且环绕通知必须有返回值, 返回值即为目标方法的返回值
+			 **/
+			//	@Around("execution(public int spring.aop.test.ArithmeticCalculatorImpl.*(int , int))")
+			//	public Object aroundMethod(ProceedingJoinPoint pjd){
+					Object result = null;
+					String methodName = pjd.getSignature().getName();
+					
+					try {
+						//前置
+						System.out.println("begin: " + methodName + ", " + Arrays.asList(pjd.getArgs()));
+						//执行目标方法
+						result = pjd.proceed();
+						
+						//返回通知
+						System.out.println("The method " + methodName + " ends with " + result);
+					} catch (Throwable e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						//异常通知
+						System.out.println("The method " + methodName + " occurs exception:" + e);
+						throw new RuntimeException(e);
+					}
+					
+					//后置通知
+					System.out.println("The method " + methodName + " ends");
+					return result;
+				}
+
+
+	2、切面优先级：
+		可以使用 @Order 注解指定切面的优先级, 值越小优先级越高
+
+
+	3、重用切面表达式：
+		/**
+	 	* 定义一个方法, 用于声明切入点表达式. 一般地, 该方法中再不需要添入其他的代码. 
+	 	* 使用 @Pointcut 来声明切入点表达式. 
+	 	* 后面的其他通知直接使用方法名来引用当前的切入点表达式. 
+	 	*/
+		@Pointcut("execution(public int spring.aop.test.ArithmeticCalculatorImpl.*(int , int))")
+		public void declareJointPointExpression(){}
+
+		@Before(value = "declareJointPointExpression()")
+		public void beforeMethod(){...}
+
+		外部引用需要加入包名
+		@Before(value = "spring.aop.test.LoggingAspect.declareJointPointExpression()")
+
+	4、
