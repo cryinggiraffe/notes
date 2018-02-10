@@ -160,4 +160,33 @@ AOP：
 		外部引用需要加入包名
 		@Before(value = "spring.aop.test.LoggingAspect.declareJointPointExpression()")
 
-	4、
+	4、使用 xml 配置
+
+	配置 bean 
+	<bean id = "arithmeticCalculator" 
+		  class = "spring.aop.xml.ArithmeticCalculatorImpl"></bean>
+		  
+	配置 aop
+	<bean id = "loggingAspect"
+		  class = "spring.aop.xml.LoggingAspect"></bean>
+		  
+	<aop:config>
+		
+		配置切点表达式
+		<aop:pointcut expression="execution(* spring.aop.xml.ArithmeticCalculator.*(int, int))" id="pointcut"/>
+		
+		配置通知
+		<aop:aspect ref="loggingAspect">
+			<aop:before method="beforeMethod" pointcut-ref="pointcut"/>
+			<aop:after method="afterMethod" pointcut-ref="pointcut"/>
+			<aop:after-throwing method="afterThrowing" pointcut-ref="pointcut"
+			throwing="e"/>
+			<aop:after-returning method="afterReturning" pointcut-ref="pointcut"
+			returning="result"/>
+			
+			<!--  
+			<aop:around method="aroundMethod" pointcut-ref="pointcut"/>
+			-->
+		</aop:aspect>
+		
+	</aop:config>

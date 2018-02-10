@@ -1,0 +1,88 @@
+1. Spring 如何在 WEB 应用中使用 ?
+
+1). 需要额外加入的 jar 包:
+
+spring-web-4.0.0.RELEASE.jar
+spring-webmvc-4.0.0.RELEASE.jar
+
+2). Spring 的配置文件, 没有什么不同
+
+3). 如何创建 IOC 容器 ? 
+
+①. 非 WEB 应用在 main 方法中直接创建
+②. 应该在 WEB 应用被服务器加载时就创建 IOC 容器: 
+
+在 ServletContextListener#contextInitialized(ServletContextEvent sce) 方法中创建 IOC 容器.
+
+③. 在 WEB 应用的其他组件中如何来访问 IOC 容器呢 ?
+
+在 ServletContextListener#contextInitialized(ServletContextEvent sce) 方法中创建 IOC 容器后, 可以把其放在 ServletContext(即 application 域)的一个属性中. 
+
+	public void contextInitialized(ServletContextEvent arg0) {
+		
+		ServletContext servletContext = arg0.getServletContext();
+		String config = servletContext.getInitParameter("configLocation");
+		
+		//创建 IOC 容器
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(config);
+		
+		//将IOC放入 ServletContext 中，可以供其它组件使用
+		servletContext.setAttribute("ApplicationContext", applicationContext);
+		
+	}
+
+	web.xml:
+		<context-param>
+    		<param-name>configLocation</param-name>
+    		在类路径下：
+    		<param-value>applicationContext.xml</param-value>
+  		</context-param>
+
+		<listener>
+	    	<listener-class>spring.struct2.listeners.SpringServletContextListener</listener-class>
+	  	</listener>
+
+	servlet:
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		//1. 从 application 域对象中得到 IOC 容器的引用
+		ServletContext servletContext = getServletContext();
+		ApplicationContext applicationContext = (ApplicationContext) servletContext.getAttribute("ApplicationContext");
+
+		//2. 从 IOC 容器中得到需要的 bean
+		Person person = applicationContext.getBean(Person.class);
+		person.hello();
+	}
+
+④. 实际上, Spring 配置文件的名字和位置应该也是可配置的! 将其配置到当前 WEB 应用的初始化参数中较为合适. 
+
+2. Spring 如何整合 Struts2 ?
+
+①. 正常加入 Struts2
+
+②. 在 Spring 的 IOC 容器中配置 Struts2 的 Action
+注意: 在 IOC 容器中配置 Struts2 的 Action 时, 需要配置 scope 属性, 其值必须为 prototype
+
+<bean id="personAction" 
+	class="com.atguigu.spring.struts2.actions.PersonAction"
+	scope="prototype">
+	<property name="personService" ref="personService"></property>	
+</bean>
+
+③. 配置 Struts2 的配置文件: action 节点的 class 属性需要指向 IOC 容器中该 bean 的 id
+
+<action name="person-save" class="personAction">
+	<result>/success.jsp</result>
+</action> 
+
+④. 加入 struts2-spring-plugin-2.3.15.3.jar
+
+3). 整合原理: 通过添加 struts2-spring-plugin-2.3.15.3.jar 以后, Struts2 会先从 IOC 容器中
+获取 Action 的实例.
+
+if (appContext.containsBean(beanName)) {
+    o = appContext.getBean(beanName);
+} else {
+    Class beanClazz = getClassInstance(beanName);
+    o = buildBean(beanClazz, extraContext);
+}
