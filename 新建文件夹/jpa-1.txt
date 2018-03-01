@@ -1,0 +1,125 @@
+一、jpa基础
+	1、persistence.xml文件
+	   <persistence-unit name="jpa-1" transaction-type="RESOURCE_LOCAL">
+
+
+	   <!-- 
+		配置使用什么 ORM 产品来作为 JPA 的实现 
+		1. 实际上配置的是  javax.persistence.spi.PersistenceProvider 接口的实现类
+		2. 若 JPA 项目中只有一个 JPA 的实现产品, 则也可以不配置该节点. 
+		-->
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+	
+		<!-- 添加持久化类 -->
+		<class>com.atguigu.jpa.helloworld.Customer</class>
+		<class>com.atguigu.jpa.helloworld.Order</class>
+	
+		<class>com.atguigu.jpa.helloworld.Department</class>
+		<class>com.atguigu.jpa.helloworld.Manager</class>
+	
+		<class>com.atguigu.jpa.helloworld.Item</class>
+		<class>com.atguigu.jpa.helloworld.Category</class>
+
+
+	   <properties>
+			<!-- 连接数据库的基本信息 -->
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql:///jpa"/>
+			<property name="javax.persistence.jdbc.user" value="root"/>
+			<property name="javax.persistence.jdbc.password" value="1230"/>
+			
+			<!-- 配置 JPA 实现产品的基本属性. 配置 hibernate 的基本属性 -->
+			<property name="hibernate.format_sql" value="true"/>
+			<property name="hibernate.show_sql" value="true"/>
+			<property name="hibernate.hbm2ddl.auto" value="update"/>
+		</properties>
+
+
+	2、基本注解
+	   @Entity:
+	   指出 java 类为实体类，映射到指定的表，表名为类名的小写
+ 	   
+ 	   @Table(name="JPA_CUTOMERS")
+ 	   实体类与表名不同时使用
+
+ 	   @Id
+ 	   声明一个实体类的属性映射为主键
+
+ 	   @GeneratedValue(strategy=GenerationType.AUTO)
+ 	   生成主键的策略
+ 	   GenerationType.IDENTITY 自增
+ 	   GenerationType.SEQUENCE 通过序列产生主键，@SequenceGenerator指定序列名，mysql不支持
+
+ 	   @Basic
+ 	   相当于不加注解，自动将属性向表映射
+
+	   @Column(name="LAST_NAME",length=50,nullable=false)
+	   实体属性与表的列名不同时使用，还可以设置类型，长度，非空等属性
+
+	   @Temporal(TemporalType.TIMESTAMP)
+	   时间格式为年-月-日-时-分-秒
+	   @Temporal(TemporalType.DATE)
+	   时间格式为年-月-日
+
+	   @Transient
+	   工具方法. 不需要映射为数据表的一列. 
+
+
+	3、过程
+		//1. 创建 EntitymanagerFactory
+		String persistenceUnitName = "jpa-1";
+		
+		
+		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
+		
+		//2. 创建 EntityManager. 类似于 Hibernate 的 SessionFactory
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		
+		//3. 开启事务
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		
+		//4. 进行持久化操作
+		Customer customer = new Customer();
+		customer.setAge(12);
+		customer.setEmail("tom@atguigu.com");
+		customer.setLastName("Tom");
+		customer.setBirth(new Date());
+		customer.setCreatedTime(new Date());
+		entityManager.persist(customer);
+		
+		//5. 提交事务
+		entityTransaction.commit();
+		
+		//6. 关闭 EntityManager
+		entityManager.close();
+		
+		//7. 关闭 EntityManagerFactory
+		entityManagerFactory.close();
+
+
+	4、主键生成策略
+		创建一个策略表，根据PK_NAME,和PK_VALUE定位到PK_VALUE的值
+
+		//生成主键方式为Table 策略，策略名称：generator="ID_GENERATOR"
+		@GeneratedValue(strategy=GenerationType.TABLE,generator="ID_GENERATOR")
+		//具体策略
+		@TableGenerator(
+				//策略名称
+				name="ID_GENERATOR",
+				//对哪个表生成主键
+				table="jpa_id_generators",
+				//定位，PK列名
+				pkColumnName="PK_NAME",
+				//PK列值
+				pkColumnValue="CUSTOMER_ID",
+				//value的列名
+				valueColumnName="PK_VALUE",
+				//自增的范围
+				allocationSize=100)
+
+
+二、jpa API
+	Persistence
+	获取 EntityManagerFactory 的实例
+		
