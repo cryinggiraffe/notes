@@ -1,0 +1,64 @@
+一、Spring Data概述：
+    1、Spring 的一个子项目。用于简化数据库访问，支持NoSQL和关系数据存储。
+
+    2、SpringData 项目所支持 NoSQL 存储：
+		MongoDB （文档数据库）
+		Neo4j（图形数据库）
+		Redis（键/值存储）
+		Hbase（列族数据库）
+
+	3、SpringData 项目所支持的关系数据存储技术：
+		JDBC
+		JPA
+
+二、JPA Spring Data : 
+	1、开发者唯一要做的，就只是声明持久层的接口，其他都交给 Spring Data JPA 来帮你完成！
+
+	2、框架怎么可能代替开发者实现业务逻辑呢？比如：当有一个 UserDao.findUserById()      
+	   这样一个方法声明，大致应该能判断出这是根据给定条件的 ID 查询出满足条件的 User 对象。
+	   Spring Data JPA 做的便是规范方法的名字，根据符合规范的名字来确定方法需要实现什么样的逻辑
+
+三、使用 Spring Data JPA 进行持久层开发需要的四个步骤：
+	1、配置 Spring 整合 JPA
+
+	2、在 Spring 配置文件中配置 Spring Data，让 Spring 为声明的接口创建代理对象。配置了 <jpa:repositories> 后，Spring 初始化容器时将会扫描 base-package 指定的包目录及其子目录，为继承 Repository 或其子接口的接口创建代理对象，并将代理对象注册为 Spring Bean，业务层便可以通过 Spring 自动封装的特性来直接使用该对象。
+
+	3、声明持久层的接口，该接口继承  Repository，Repository 是一个标记型接口，它不包含任何方法，如必要，Spring Data 可实现 Repository 其他子接口，其中定义了一些常用的增删改查，以及分页相关的方法。
+
+	4、在接口中声明需要的方法。Spring Data 将根据给定的策略来为其生成实现代码。
+
+四、Repository 接口
+	1、Repository 接口是 Spring Data 的一个核心接口，它不提供任何方法，开发者需要在自己定义的接口中声明需要的方法 
+    public interface Repository<T, ID extends Serializable> {} 
+
+	2、Spring Data可以让我们只定义接口，只要遵循 Spring Data的规范，就无需写实现类。  
+
+	3、与继承 Repository 等价的一种方式，就是在持久层接口上使用 @RepositoryDefinition 注解，并为其指定 domainClass 和 idClass 属性。如下两种方式是完全等价的
+
+	4、Repository 的子接口
+	   （1）Repository： 仅仅是一个标识，表明任何继承它的均为仓库接口类
+	   （2）CrudRepository： 继承 Repository，实现了一组 CRUD 相关的方法 
+	   （3）PagingAndSortingRepository： 继承 CrudRepository，实现了一组分页排序相关的方法 
+	   （4）JpaRepository： 继承 PagingAndSortingRepository，实现一组 JPA 规范相关的方法 
+       （5）自定义的 XxxxRepository 需要继承 JpaRepository，这样的 XxxxRepository 接口就具备了通用的数据访问控制层的能力。
+	   （6）JpaSpecificationExecutor： 不属于Repository体系，实现一组 JPA Criteria 查询相关的方法 
+
+六、SpringData 方法定义规范
+	1、查询方法以 find | read | get 开头，
+	涉及条件查询时，条件的属性用条件关键字连接，要注意的是：条件属性以首字母大写。 
+
+七、查询方法解析流程
+	假如创建如下的查询：findByUserDepUuid()，
+	1、框架在解析该方法时，首先剔除 findBy，然后对剩下的属性进行解析
+
+	2、假设查询实体为Doc，先判断 userDepUuid （根据 POJO 规范，首字母变为小写）是否为查询实体的一个属性，如果是，则表示根据该属性进行查询；如果没有该属性，继续第二步；
+
+	3、从右往左截取第一个大写字母开头的字符串(此处为Uuid)，然后检查剩下的字符串是否为查询实体的一个属性，如果是，则表示根据该属性进行查询；如果没有该属性，则重复第二步，继续从右往左截取；最后假设 user 为查询实体的一个属性；
+
+	4、接着处理剩下部分（DepUuid），先判断 user 所对应的类型是否有depUuid属性，如果有，则表示该方法最终是根据 “ Doc.user.depUuid” 的取值进行查询；否则继续按照步骤 2 的规则从右往左截取，最终表示根据 “Doc.user.dep.uuid” 的值进行查询。
+
+	5、可能会存在一种特殊情况，比如 Doc包含一个 user 的属性，也有一个 userDep 属性，此时会存在混淆。可以明确在属性之间加上 "_" 以显式表达意图，比如 "findByUser_DepUuid()" 或者 "findByUserDep_uuid()"
+
+	6、特殊的参数： 还可以直接在方法的参数上加入分页或排序的参数，比如：
+	Page<UserModel> findByName(String name, Pageable pageable);
+	List<UserModel> findByName(String name, Sort sort);
