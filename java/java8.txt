@@ -64,25 +64,25 @@
             2)定制排序sorted(com)(comparator)
    3、终止操作
       (1)查找和匹配
-	 allMatch-是否匹配所有元素
-	 anyMatch-是否只是匹配一个
-	 noneMatch-是否没有匹配所有元素
-	 findFirst-返回第一个元素
-	 findAny-返回任意一个
-	 count-返回总个数
-	 max
-  	 min
+	      allMatch-是否匹配所有元素
+	      anyMatch-是否只是匹配一个
+	      noneMatch-是否没有匹配所有元素
+	      findFirst-返回第一个元素
+	      findAny-返回任意一个
+	      count-返回总个数
+	      max
+  	    min
       (2)归约
-         reduce-可以讲流中元素反复结合起来，得到一个值
+        reduce-可以讲流中元素反复结合起来，得到一个值
       (3)收集
-         Collect-将流转换为其他形式
-         接收一个collector接口的实现，用于给Stream中元素汇总的方法
+        Collect-将流转换为其他形式
+        接收一个collector接口的实现，用于给Stream中元素汇总的方法
          1)收集指定结果，放入集合中
          2)求最大值、最小值等
          3)分组、分区
          4)统计
 
     4、并行和串行
-       (1)fork/join
-          fork:将任务分成多个小任务
-          join: 将任务组合成大任务
+      (1)fork/join
+        fork:将任务分成多个小任务
+        join: 将任务组合成大任务

@@ -76,6 +76,7 @@
 四、DAO：Data Access Object
    1、包含对数据的增、删、改、查，但不包含任何业务信息
    2、获取结果集->处理结果集->List<Map<String,Object>>->转化为对象->List<T>
+   
 五、Java类的属性：
    1、通过get(set)定义属性，去除get(set)后，首字母变小写，为类的属性!!
    2、之前的属性为成员变量，或者字段
