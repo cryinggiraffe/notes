@@ -1,0 +1,12 @@
+1、日志输出参数
+   实例：
+   	git log --oneline --graph
+
+   -author="" ——只显示某个用户的提交任务
+   -name-only ——只显示变更文件的名称
+   -oneline ——将提交信息压缩到一行显示
+   -graph ——显示所有提交的依赖树
+   -reverse ——逆序显示提交记录（最先提交的在最上面）
+   -after="a week ago" ——显示某个日期只之后发生的提交
+   -after="a week ago" ——显示某个日期只之前发生的提交
+

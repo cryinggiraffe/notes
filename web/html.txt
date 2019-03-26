@@ -1,0 +1,275 @@
+1、head
+(1)<meta charset= "utf-8"/>设置编码
+(2)<br />换行
+(3)<h1></h1>,<h2></h2>标题的检索顺序
+(4)<p></p>段落
+(5)<img src = "" alt = ""> alt是供搜索引擎检索使用
+(6)meta标签：name,keywords设置关键字,description检索页面的关键词和描述, content 指内容 搜索引擎根据会同时检索页面的关键词--!>
+(7)自动刷新：<meta http-equiv="refresh" content = "2;url=https://www.baidu.com"/> """"
+(7)<iframe> </iframe>内联框架：引用另一个文档，但有时不被搜索引擎所检索，一般不推荐使用
+(8)<a></a>:超链接，href:目标地址，target:在何处打开,(="_blank":在空白页打开) ("=_内联框架名称"在內联框架中打开)
+(9)超链接属性href = # 有回到顶部的意思，#idname 转到页面哪个部分
+
+2、css
+(1)内联标签不推荐使用
+(2)在head中的style中写css样式
+(3)css文件：选择权、生命块
+(4)注释：/**/
+
+3.div,span
+(1)块元素，独占一行，主要用来布局
+(2)内联元素：只占自身大小,行内元素，设置文本的样式
+(3)a元素可以包含任意元素
+(4)p里面不能包含块元素 
+
+4、元素选择器
+(1)标签+{};
+(2)#id+{};
+(3).class+{};
+(4)通配*{};
+(5)分组选择器：并集，用,分隔
+(6)通配选择器：交集，不用,分离
+
+5、后代元素选择器
+(1)父元素+子元素{};
+
+6、伪类选择器
+(1)专门用来表示元素的一种状态，访问过的超链接、获取焦点的文本框
+(2)a:link a:visoted  有些浏览器不支持字体，背景的变化
+(3)a:hover 鼠标移入状态 a:active 鼠标点击状态
+(3)伪类可以用于其他元素
+(4):focus获取焦点 ::selection p中文字选中内容
+(5)写两个可以解决兼容
+
+7、伪元素
+(1)表示元素中的一些特殊位置
+(2)p;first-letter  p:first-line
+(3)p:before{
+	content:"";
+}
+p:after{
+	content:"";
+}
+
+8、属性选择器
+(1)p标签中的title属性值为鼠标移入是显示的值:<p title =“ads”>122</p>
+(2)p[title]{
+
+}
+p[title="属性值"]{
+
+}
+p[title^="属性值"]{
+	以指定内容开头
+}
+p[title$="属性值"]{
+	以制定内容结尾
+}
+:根据元素的属性或属性值选择指定元素
+
+9、子元素的伪类
+(1)p:first-child p:last-child p:nth-child(n)
+(2)even偶数 odd奇数
+(3)first-child:所有子元素的第一个
+   first-of-type：所有当前类型的第一个
+
+10、兄弟元素选择器
+(1)before + after 前一个 + 后一个
+(2)before ～ all  前面 + 后面所有
+
+11、否定伪类
+从选种的元素中删除某些元素
+：not(.class #id ...){
+
+}
+
+12、样式的继承
+(1)父类的样式可以被后代所继承
+(2)背景相关不能被继承
+
+13、优先级
+1、内联样式：1000
+	<p style = "" :...;>12</p>
+2、id > 类，伪类> 元素（p{}）> 通配* > 继承
+3、不同优先级可以叠加，但不能超过其数量级
+4、相同优先级选择靠后的
+5、!imporant最高
+6、伪元素：link, visited, hover,actice
+
+14、文本标签
+(1)em:强调语气，斜体  strong:强调内容，粗体
+(2)i,b无意义，i:斜体 b：粗体
+(3)small比父标签的字体小
+(4)cite:语义，书名
+(5)q:短引用，默认加引号
+(6)blockquote:长引用，块元素
+(7)sup上标 sub下标
+(8)del 添加删除线  ins插入：下划线
+(9)pre:保存格式 code:表示为代码
+
+15、列表:块元素
+(1)无序列表：ul li:列表项
+(2)有序列表：ol 
+(3)可以相互嵌套
+(4)定义列表:dl:对一些内容进行定义
+   1）dt：被定义内容
+   2）dd:对定义内容的描述
+
+16、单位
+(1)长度单位：px, 百分比(父元素的百分比)，
+   1em = 1font-size，相对于字体大小
+(2)颜色：单词，rgb(r,g.b)(每个颜色范围是0-255，百分比：0%=0，100%=255)
+   16进制：#...... 00-ff
+
+17、字体
+(1)font-size：设置的是格的大小，不是字体大小
+(2)font-family:..,..,..; 设置字体，
+(3) 字体分类：	
+    1)serif(衬线字体)
+    2)sans-serif(非衬线字体)
+    3)monospace(等宽字体)
+    4)cursive(草书字体)
+    5)fantasy(虚幻字体)
+(4)font-style:
+   1)normal
+   2)italic(常用)，oblique 倾斜
+(5)font-weight:字体粗细 100-900之间
+   1)bold粗体
+(6)font-variant:small-caps 小型大写
+
+(7)font:直接设置所有样式
+
+18、行高
+	1)line-height
+	2)设置行高与父元素的高度一致，文本居中
+	3)font:30px/50px 表示字体大小30px,行高50px
+
+19、其他
+text-transform : 设置大小写
+tetx-decoration : 设置上划线、下划线、删除线
+letter-spacing : 字符间距
+
+word-spaceing : 单词间距
+text_align : 文本对齐
+text-indent : 首行缩紧
+    
+
+20、盒模型
+(1)width,height : 设置div内容区的宽、高
+(2)boder-width: : 设置边框的宽度
+   1)一个值：四条边，两个值：对称设置，三个值：上，对称，下，四个值：顺时针
+   2)颜色同理
+(3)内边距：边框和内容区之间的距离
+   1)padding:内容区里的元素会延伸到内边距
+(4)外边距：与其他盒子之间的距离
+   1)margin:auto : 设置的是水平方向外边距为最大值，两侧都是auto,则div居中
+   2)垂直外边距：兄弟元素之间，相邻的div的外边距取最大值而不是求和，父子元素之间相邻，子元素的外边距会设置给父元素，可以通过添加内边距或修改父子元素不相邻。
+(5)清楚浏览器默认样式：
+   *{
+		magrin:10;
+		padding:0;
+   }
+
+(6)内联元素的盒模型
+   1)不能设置width，和height
+   2)设置水平方向内边距影响布局，垂直方向不影响布局
+   3)边框同3
+   4)水平方向外边距求和，不支持垂直方向
+
+(7)display和visiblity
+   1)display:none：隐藏元素及其位置
+	         :black：更改元素为块元素
+			 :inline-block：即保留块元素，又保留内联
+   2)visiblity:hidden：隐藏元素，保留位置
+
+(8)overflow:处理子元素溢出父元素的部分
+   1)auto:根据需要添加滚动条
+   2)hidden:隐藏内容
+
+(9)文档流:
+   1)块元素在文档流中的高度和内容或子元素的高度一致，宽度与父元素一致
+   2)内联元素的宽度和高度都被内容撑开
+
+(10)浮动:float
+    1)浮动元素上面是一个没有浮动的块元素，浮动元素不会超过块元素
+	2)浮动元素不会超过上边的兄弟元素
+	3)浮动元素不会盖住文字
+	4)块元素、内联元素，设置浮动后，会脱离文档流，宽度和高度被内容撑开，内联元素可以设置宽高
+	5)子元素浮动会导致父元素高度塌陷
+
+(11)父元素高度塌陷
+    1)BFC开启后：父元素垂直外边距不会和子元素重叠；不会被浮动元素覆盖；可以包含浮动元素
+    2)高度塌陷问题的解决：
+	给父元素添加overflow:hidden；在父元素里的最后加一个空白div，设置样式clear:both;
+	推荐：.父类:after{
+		content = "";
+		display = block;
+		clear:both；
+	} clear：清楚浮动对元素的影响	
+
+
+(12)定位:position
+    1)相对定位：left,right,top,bottom，是针对原来的位置进行定位，不会脱离文档流，会使元素提升一个层级
+    2)绝对定位：脱离文档流,相对于离他最近的开启定位的祖先元素进行定位，若祖先元素都没有开启定位，相对于浏览器窗口进行定位，绝对定位会使元素提升一个层级。内联元素会变成块元素
+    3)固定定位：位置相对于浏览器定位，固定在窗口的某个位置，不会随滚动条滚动
+
+    4)层级：如果层级相同，下边的元素盖住上边的；z-index设置层级，但必须的开启定位；父元素比子元素的层级高，但盖不住子元素
+
+	5)opacity:透明度,值在0-1之间，1是完全透明
+
+(13)背景：background
+    1)background-image:url();背景图片
+    2)背景颜色会作为背景图片的底色
+    3)background-repeat:no-repeat/repeat-x/repeat-y
+    4)background-position: left, right,center,top,bottom；也可以指定像素（第一个水平偏移量，第二个是垂直偏移量，默认第二个是center）
+
+    5)background-attachment: 相对于浏览器窗口（fixed、scorll、）
+    
+    6)背景图片以外部资源加载进网页，浏览器每加载一个外部资源就单独发送一次请求，但不是同时加载，当资源被用到后才去加载资源。加载图片需要一定的时间，背景图片无法显示，导致出现闪烁的情况。为了解决这种问题，可以将三张图片整合成一张照片，然后平移图片。
+    7)属性可以简写：background:…;
+
+(14)表格:<table>
+    1)一个tr就有一行，一个tr里有一个td就有一个单元格
+    2)colspan：横向合并单元格，rowspan：纵向合并格
+    3)table和td之间有默认距离：通过border-spacing设置。
+    4)border-collapse设置表格边框合并，设置了边框合并，border-spacing失效
+    5)可以使用th表示表头的内容
+
+(15)长表格
+    1)thead、tbody、tfoot
+    2)如果表格中没有写tbody,浏览器将左右内容写入tbody中，tr是tbody的子元素,通过table > tr 无法选中行
+
+(16)完善clearfix
+    相邻的父元素和子元素，子元素的外边距会传递设置给父元素(父子元素的外边距重叠)，这时，可以：
+    .father:before{content:““;display:table}
+    最终解决：.clearfix:before,.clearfix:after{
+			content: "";
+			display: table;
+			clear: both;
+		}
+
+(17)表单:<form></form>
+    1)提交给服务器。
+	2)<input />;type:类型，name:属性名，value:属性值
+	  type:text(文本框)、password(密码框)、submit(提交按钮、value的值为按钮的名字)、radio(单选按钮，name代表类别，checbox多选框、reset(重置按钮)、button(按钮)
+	  checked="checked"属性，添加默认项
+    3)下拉列表：select，选项：option(name在select中写，value在option中写)，multiple="multiple"多选
+	  在option中添加selected="selected"设置默认选中。
+	  optgroup选项分组。通过label指定属性的名字
+	4)textarea标签：多行文本域
+    5)也可以使用button标签
+	6)label标签，for=“元素的id”
+	7)fieldset:表单分组，legend:分组名称
+
+
+(18)框架集：与内联框架作用相同，在一个页面里引入其他外部框架
+    1)不能包含body
+	2)<frameset>
+		<frame />
+	  </frameset>
+
+(19)条件：只在ie6有效
+    <!--[if IE]-->  <![endif]-->
+
+
+
